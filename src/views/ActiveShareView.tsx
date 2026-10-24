@@ -22,6 +22,7 @@ import { SenderPeer, WebRTCConnectionState } from '../services/webrtc.ts';
 import { deleteShareSession, subscribeToShare, updateShareStatus } from '../services/firebase.ts';
 import { uploadToCloudinary } from '../services/cloudinary.ts';
 import { useToast } from '../context/ToastContext.tsx';
+import { GhibliDancingDuo } from '../components/GhibliArt.tsx';
 
 interface ActiveShareViewProps {
   share: ShareSession;
@@ -433,23 +434,41 @@ export const ActiveShareView: React.FC<ActiveShareViewProps> = ({
                 )}
 
                 {p2pState === 'transferring' && (
-                  <>
-                    <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin shrink-0" />
-                    <div>
-                      <p className="text-sm font-bold text-cyan-300">TRANSFER STARTED</p>
-                      <p className="text-xs text-slate-400">Streaming binary chunks with backpressure control.</p>
+                  <div className="w-full">
+                    <div className="flex items-center gap-3 mb-2">
+                      <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin shrink-0" />
+                      <div>
+                        <p className="text-sm font-bold text-cyan-300">TRANSFER STARTED</p>
+                        <p className="text-xs text-slate-400">Streaming binary chunks with backpressure control.</p>
+                      </div>
                     </div>
-                  </>
+                    <div className="bg-slate-900/80 rounded-2xl border border-emerald-500/30 overflow-hidden my-2">
+                      <GhibliDancingDuo label="Streaming files to receiver · Spirits dancing joyfully!" compact={true} />
+                    </div>
+                  </div>
                 )}
 
                 {p2pState === 'completed' && (
-                  <>
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                    <div>
-                      <p className="text-sm font-bold text-emerald-300">TRANSFER COMPLETED ✓</p>
-                      <p className="text-xs text-slate-400">All files received successfully by peer.</p>
+                  <div className="w-full text-center py-2">
+                    <div className="bg-slate-900/80 rounded-2xl border border-emerald-500/30 overflow-hidden mb-3">
+                      <GhibliDancingDuo label="🎉 All files delivered! Spirits cheering!" compact={true} />
                     </div>
-                  </>
+                    <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight">
+                      🎉 SUCCESSFULLY TRANSFERRED ALL FILES!
+                    </h3>
+                    <p className="text-sm font-bold text-cyan-300 mt-1">
+                      THANKS FOR USING SHAREFLOW
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Receiver has successfully reconstructed the files.
+                    </p>
+                    <button
+                      onClick={onClose}
+                      className="mt-3 px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg transition"
+                    >
+                      Done &amp; Return to Dashboard
+                    </button>
+                  </div>
                 )}
 
                 {(p2pState === 'failed' || p2pState === 'disconnected') && (

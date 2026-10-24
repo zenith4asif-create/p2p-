@@ -20,6 +20,7 @@ import { formatBytes, formatSpeed, formatTimeLeft, getFileCategory, isShareExpir
 import { getShareByCode, updateShareStatus } from '../services/firebase.ts';
 import { ReceiverPeer, WebRTCConnectionState } from '../services/webrtc.ts';
 import { useToast } from '../context/ToastContext.tsx';
+import { GhibliDancingDuo, FullScreenSuccessModal } from '../components/GhibliArt.tsx';
 
 interface ReceiveViewProps {
   initialCode?: string;
@@ -48,6 +49,7 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
   const [p2pStatusDetail, setP2pStatusDetail] = useState<string>('');
   const [transferProgress, setTransferProgress] = useState<TransferProgress | null>(null);
   const [receivedFiles, setReceivedFiles] = useState<Record<string, { blob: Blob; url: string }>>({});
+  const [showFullScreenSuccess, setShowFullScreenSuccess] = useState<boolean>(false);
   const receiverPeerRef = useRef<ReceiverPeer | null>(null);
 
   // Auto-search if initialCode is provided
@@ -89,16 +91,30 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
 
         if (state === 'connected') {
           showToast('Direct P2P Link Established ✓', 'success');
+        } else if (state === 'completed') {
+          setTimeout(() => {
+            setShowFullScreenSuccess(true);
+          }, 300);
         }
       },
       onProgress: (prog) => {
         setTransferProgress(prog);
       },
       onFileReceived: (received) => {
-        setReceivedFiles((prev) => ({
-          ...prev,
-          [received.name]: { blob: received.blob, url: received.url }
-        }));
+        setReceivedFiles((prev) => {
+          const updated = {
+            ...prev,
+            [received.name]: { blob: received.blob, url: received.url }
+          };
+          const totalFilesCount = Object.keys(share.files).length;
+          if (Object.keys(updated).length >= totalFilesCount) {
+            setTimeout(() => {
+              setShowFullScreenSuccess(true);
+            }, 400);
+          }
+          return updated;
+        });
+
         showToast(`Received ${received.name}! ✓`, 'success');
 
         // Automatically trigger browser download
@@ -211,6 +227,9 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
       await handleDownloadCloudFile(file);
       await new Promise((r) => setTimeout(r, 400));
     }
+    setTimeout(() => {
+      setShowFullScreenSuccess(true);
+    }, 500);
   };
 
   const getFileIcon = (file: FileMetadata) => {
@@ -496,6 +515,13 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
           </div>
         )}
 
+        {/* Dancing Ghibli Animation during connection or transfer */}
+        {(p2pState === 'transferring' || p2pState === 'connected' || p2pState === 'connecting') && (
+          <div className="mb-4 bg-slate-950/60 rounded-2xl border border-emerald-500/30 overflow-hidden">
+            <GhibliDancingDuo label="Receiving stream active · Two Ghibli spirits dancing together!" />
+          </div>
+        )}
+
         {/* Cloud Mode Download All button */}
         {share.mode === 'cloud' && (
           <button
@@ -565,6 +591,14 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
           })}
         </div>
       </div>
+
+      {/* Full Screen Celebratory Success Modal */}
+      <FullScreenSuccessModal
+        isOpen={showFullScreenSuccess}
+        files={fileList}
+        onClose={() => setShowFullScreenSuccess(false)}
+        onGoHome={() => onNavigate('landing')}
+      />
 
     </div>
   );
