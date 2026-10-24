@@ -1,0 +1,6 @@
+{
+  "name": "ShareFlow - Universal Privacy-Focused File Sharing",
+  "description": "Fast, private and temporary file sharing using QR codes, short codes, links, WebRTC P2P and temporary Cloudinary storage with automatic 10-minute expiry.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

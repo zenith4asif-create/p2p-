@@ -1,0 +1,46 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['uid', 'email']) && newData.child('uid').val() === $uid"
+      }
+    },
+    "shares": {
+      ".indexOn": ["ownerUid", "code", "expiresAt"],
+      "$shareId": {
+        /* Allowed to read if owner, OR if the share is unexpired for active receivers */
+        ".read": "(auth != null && data.child('ownerUid').val() === auth.uid) || (data.exists() && data.child('expiresAt').val() > now)",
+        
+        /* Create rules: must be authenticated owner, expiration must be bounded (~10 minutes), createdAt cannot be in future */
+        ".write": "(auth != null && !data.exists() && newData.child('ownerUid').val() === auth.uid && newData.child('expiresAt').val() <= now + 660000 && newData.child('createdAt').val() <= now + 5000) || " +
+                  /* Owner can update metadata or delete, but CANNOT extend expiresAt or change ownerUid or createdAt */
+                  "(auth != null && data.exists() && data.child('ownerUid').val() === auth.uid && (!newData.exists() || (newData.child('ownerUid').val() === data.child('ownerUid').val() && newData.child('createdAt').val() === data.child('createdAt').val() && newData.child('expiresAt').val() <= data.child('expiresAt').val()))) || " +
+                  /* Receiver can update status (e.g. connected, completed) only if share is not expired */
+                  "(data.exists() && data.child('expiresAt').val() > now && newData.child('ownerUid').val() === data.child('ownerUid').val() && newData.child('expiresAt').val() === data.child('expiresAt').val() && newData.child('createdAt').val() === data.child('createdAt').val())"
+      }
+    },
+    "shareCodes": {
+      "$code": {
+        /* Receiver can read the mapping if not expired */
+        ".read": "data.exists() && data.child('expiresAt').val() > now",
+        /* Owner can register short code matching their share, and cannot extend expiration beyond 10 mins */
+        ".write": "(auth != null && !data.exists() && newData.child('ownerUid').val() === auth.uid && newData.child('expiresAt').val() <= now + 660000) || (auth != null && data.exists() && data.child('ownerUid').val() === auth.uid)"
+      }
+    },
+    "signaling": {
+      "$sessionId": {
+        /* Signaling is accessible only while active */
+        ".read": "true",
+        ".write": "!data.exists() || data.child('expiresAt').val() > now || newData.child('expiresAt').val() > now"
+      }
+    },
+    "cleanupQueue": {
+      "$shareId": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    }
+  }
+}
