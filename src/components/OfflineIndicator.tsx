@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { WifiOff, X } from 'lucide-react';
-import { GhibliNoInternet } from './GhibliArt.tsx';
+import { WifiOff, X, Activity } from 'lucide-react';
+import { GhibliTowerBreakdown } from './GhibliArt.tsx';
 
 export const OfflineIndicator: React.FC = () => {
   const [isOnline, setIsOnline] = useState(
     typeof navigator !== 'undefined' ? navigator.onLine : true
   );
   const [showDetailedModal, setShowDetailedModal] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -27,6 +28,21 @@ export const OfflineIndicator: React.FC = () => {
     };
   }, []);
 
+  const handleTestReconnect = async () => {
+    setIsTesting(true);
+    try {
+      // Test small fetch with cache bust
+      await fetch('/favicon.ico?t=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
+      setIsOnline(true);
+      setShowDetailedModal(false);
+    } catch {
+      // Still offline
+      setIsOnline(false);
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
   if (isOnline) return null;
 
   return (
@@ -38,28 +54,36 @@ export const OfflineIndicator: React.FC = () => {
       >
         <div className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
         <WifiOff className="w-4 h-4 text-amber-400" />
-        <span>No Internet Connection · Offline</span>
+        <span>No Internet Connection · Tower Signal Broken</span>
       </div>
 
-      {/* No Internet Video Dialog */}
+      {/* Ghibli Broken Tower Animation Modal */}
       {showDetailedModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in">
-          <div className="relative w-full max-w-sm rounded-3xl bg-neutral-950 border border-neutral-800 p-6 shadow-2xl">
+          <div className="relative w-full max-w-md rounded-3xl bg-neutral-950 border border-neutral-800 p-6 shadow-2xl">
             <button
               onClick={() => setShowDetailedModal(false)}
-              className="absolute top-4 right-4 p-2 rounded-xl bg-neutral-900 text-neutral-400 hover:text-white transition"
+              className="absolute top-4 right-4 p-2 rounded-xl bg-neutral-900 text-neutral-400 hover:text-white transition z-20"
+              aria-label="Close offline modal"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <GhibliNoInternet />
+            {/* Ghibli Animated Transmission Tower Breakdown */}
+            <GhibliTowerBreakdown onRetry={handleTestReconnect} />
 
-            <button
-              onClick={() => setShowDetailedModal(false)}
-              className="w-full mt-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 font-semibold text-xs transition"
-            >
-              Dismiss &amp; Keep Waiting
-            </button>
+            <div className="mt-4 pt-3 border-t border-neutral-900 flex items-center justify-between text-[11px] text-neutral-500">
+              <span className="flex items-center gap-1.5">
+                <Activity className={`w-3.5 h-3.5 ${isTesting ? 'text-amber-400 animate-spin' : 'text-neutral-500'}`} />
+                <span>{isTesting ? 'Checking tower carrier...' : 'Listening for reconnection...'}</span>
+              </span>
+              <button
+                onClick={() => setShowDetailedModal(false)}
+                className="text-neutral-400 hover:text-white underline underline-offset-2"
+              >
+                Hide
+              </button>
+            </div>
           </div>
         </div>
       )}
