@@ -308,7 +308,7 @@ export const ActiveShareView: React.FC<ActiveShareViewProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
         
         {/* Left Card: QR Code & Sharing Controls (5 cols) */}
-        <div className="md:col-span-5 bg-slate-900/60 rounded-3xl border border-slate-800 p-6 text-center">
+        <div className="md:col-span-5 bg-neutral-950/90 rounded-3xl border border-neutral-800 p-6 text-center">
           
           {/* QR Code Container */}
           <div className="bg-white p-4 rounded-2xl inline-block shadow-2xl mb-4 max-w-[240px] w-full aspect-square">
@@ -377,7 +377,7 @@ export const ActiveShareView: React.FC<ActiveShareViewProps> = ({
         <div className="md:col-span-7 space-y-4">
           
           {/* Connection Status Banner */}
-          <div className="bg-slate-900/60 rounded-3xl border border-slate-800 p-6">
+          <div className="bg-neutral-950/90 rounded-3xl border border-neutral-800 p-6">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 Connection Status
@@ -401,26 +401,37 @@ export const ActiveShareView: React.FC<ActiveShareViewProps> = ({
             </div>
 
             {/* Dynamic Status Display */}
-            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800/80 mb-4">
-              <div className="flex items-center gap-3">
+            <div className="p-4 rounded-2xl bg-black border border-neutral-800 mb-4">
+              <div className="flex flex-col gap-3">
                 {p2pState === 'waiting' && (
-                  <>
-                    <div className="w-3 h-3 rounded-full bg-amber-400 animate-ping shrink-0" />
-                    <div>
-                      <p className="text-sm font-bold text-amber-300">WAITING FOR RECEIVER...</p>
-                      <p className="text-xs text-slate-400">Scan QR or enter code on the receiving device to connect.</p>
+                  <div className="w-full">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-3 h-3 rounded-full bg-amber-400 animate-ping shrink-0" />
+                      <div>
+                        <p className="text-sm font-bold text-amber-300">WAITING FOR RECEIVER...</p>
+                        <p className="text-xs text-neutral-400">Scan the QR code or enter code {currentShare.code} on another device.</p>
+                      </div>
                     </div>
-                  </>
+                    {/* Ghibli Mascots Dancing while waiting */}
+                    <div className="bg-neutral-950 rounded-2xl border border-neutral-800/90 overflow-hidden my-2">
+                      <GhibliDancingDuo label="Ren & Aoi are dancing while waiting for receiver to connect..." compact={true} />
+                    </div>
+                  </div>
                 )}
 
                 {p2pState === 'connecting' && (
-                  <>
-                    <Loader2 className="w-5 h-5 text-cyan-400 animate-spin shrink-0" />
-                    <div>
-                      <p className="text-sm font-bold text-cyan-300">RECEIVER CONNECTED ✓</p>
-                      <p className="text-xs text-slate-400">Establishing direct P2P DataChannel...</p>
+                  <div className="w-full">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Loader2 className="w-5 h-5 text-emerald-400 animate-spin shrink-0" />
+                      <div>
+                        <p className="text-sm font-bold text-emerald-300">RECEIVER CONNECTED ✓</p>
+                        <p className="text-xs text-neutral-400">Negotiating WebRTC offer and establishing secure channel...</p>
+                      </div>
                     </div>
-                  </>
+                    <div className="bg-neutral-950 rounded-2xl border border-neutral-800/90 overflow-hidden my-2">
+                      <GhibliDancingDuo label="Receiver connected! Mascots dancing enthusiastically..." compact={true} />
+                    </div>
+                  </div>
                 )}
 
                 {p2pState === 'connected' && (
@@ -428,7 +439,7 @@ export const ActiveShareView: React.FC<ActiveShareViewProps> = ({
                     <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
                     <div>
                       <p className="text-sm font-bold text-emerald-300">P2P DATACHANNEL READY ✓</p>
-                      <p className="text-xs text-slate-400">Peer connection established. Ready for transmission.</p>
+                      <p className="text-xs text-neutral-400">Peer connection established. Ready for transmission.</p>
                     </div>
                   </>
                 )}
@@ -436,35 +447,35 @@ export const ActiveShareView: React.FC<ActiveShareViewProps> = ({
                 {p2pState === 'transferring' && (
                   <div className="w-full">
                     <div className="flex items-center gap-3 mb-2">
-                      <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin shrink-0" />
+                      <RefreshCw className="w-5 h-5 text-emerald-400 animate-spin shrink-0" />
                       <div>
-                        <p className="text-sm font-bold text-cyan-300">TRANSFER STARTED</p>
-                        <p className="text-xs text-slate-400">Streaming binary chunks with backpressure control.</p>
+                        <p className="text-sm font-bold text-emerald-300">TRANSFER STARTED</p>
+                        <p className="text-xs text-neutral-400">Streaming binary chunks with backpressure control.</p>
                       </div>
                     </div>
-                    <div className="bg-slate-900/80 rounded-2xl border border-emerald-500/30 overflow-hidden my-2">
-                      <GhibliDancingDuo label="Streaming files to receiver · Spirits dancing joyfully!" compact={true} />
+                    <div className="bg-neutral-950 rounded-2xl border border-emerald-500/30 overflow-hidden my-2">
+                      <GhibliDancingDuo label="Streaming files to receiver · Ren & Aoi dancing joyfully!" compact={true} />
                     </div>
                   </div>
                 )}
 
                 {p2pState === 'completed' && (
                   <div className="w-full text-center py-2">
-                    <div className="bg-slate-900/80 rounded-2xl border border-emerald-500/30 overflow-hidden mb-3">
-                      <GhibliDancingDuo label="🎉 All files delivered! Spirits cheering!" compact={true} />
+                    <div className="bg-neutral-950 rounded-2xl border border-emerald-500/30 overflow-hidden mb-3">
+                      <GhibliDancingDuo label="🎉 All files delivered! Ren & Aoi cheering!" compact={true} />
                     </div>
                     <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight">
                       🎉 SUCCESSFULLY TRANSFERRED ALL FILES!
                     </h3>
-                    <p className="text-sm font-bold text-cyan-300 mt-1">
+                    <p className="text-sm font-bold text-emerald-400 mt-1">
                       THANKS FOR USING SHAREFLOW
                     </p>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-neutral-400 mt-1">
                       Receiver has successfully reconstructed the files.
                     </p>
                     <button
                       onClick={onClose}
-                      className="mt-3 px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg transition"
+                      className="mt-3 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs shadow-lg transition"
                     >
                       Done &amp; Return to Dashboard
                     </button>

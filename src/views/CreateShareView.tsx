@@ -218,8 +218,8 @@ export const CreateShareView: React.FC<CreateShareViewProps> = ({
         onClick={() => fileInputRef.current?.click()}
         className={`relative border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center cursor-pointer transition-all ${
           isDragging
-            ? 'border-cyan-400 bg-cyan-500/10 scale-[1.01]'
-            : 'border-slate-800 hover:border-slate-700 bg-slate-900/40 hover:bg-slate-900/70'
+            ? 'border-emerald-400 bg-emerald-500/10 scale-[1.01]'
+            : 'border-neutral-850 hover:border-neutral-700 bg-neutral-950/80 hover:bg-neutral-900/60'
         }`}
       >
         <input
@@ -375,7 +375,7 @@ export const CreateShareView: React.FC<CreateShareViewProps> = ({
         <button
           onClick={handleCreateShare}
           disabled={selectedFiles.length === 0 || isSubmitting}
-          className="flex-1 sm:flex-initial px-8 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-cyan-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          className="flex-1 sm:flex-initial px-8 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-sm shadow-xl shadow-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
           {isSubmitting ? (
             <>

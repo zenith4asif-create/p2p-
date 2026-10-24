@@ -392,19 +392,19 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
     <div className="max-w-3xl mx-auto px-4 py-6">
       
       {/* Expiry and Code Banner */}
-      <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-800">
+      <div className="flex items-center justify-between pb-4 mb-6 border-b border-neutral-850">
         <div>
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+          <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest">
             Active Share Code
           </span>
-          <p className="font-mono text-xl font-black text-cyan-400 tracking-wider">
+          <p className="font-mono text-xl font-black text-emerald-400 tracking-wider">
             {share.code}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800">
           <Clock className="w-4 h-4 text-amber-400" />
-          <span className="text-xs text-slate-400">Expires:</span>
+          <span className="text-xs text-neutral-400">Expires:</span>
           <span className="font-mono text-sm font-bold text-amber-300">
             {formatTimeLeft(timeLeftSec)}
           </span>
@@ -412,7 +412,7 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
       </div>
 
       {/* Connection & Transfer Status Card */}
-      <div className="bg-slate-900/60 rounded-3xl border border-slate-800 p-6 mb-6">
+      <div className="bg-neutral-950 rounded-3xl border border-neutral-800 p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">

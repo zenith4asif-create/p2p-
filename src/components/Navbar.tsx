@@ -34,7 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/80">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-black/90 border-b border-neutral-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
         {/* Brand Logo */}
@@ -42,17 +42,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={() => onNavigate('landing')}
           className="flex items-center gap-3 cursor-pointer group"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-600 p-[2px] shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-all duration-300">
-            <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-              <Share2 className="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform duration-300" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 p-[2px] shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/40 transition-all duration-300">
+            <div className="w-full h-full bg-black rounded-[10px] flex items-center justify-center">
+              <Share2 className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
             </div>
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-lg tracking-tight text-white group-hover:text-cyan-300 transition-colors">
+              <span className="font-bold text-lg tracking-tight text-white group-hover:text-emerald-300 transition-colors">
                 ShareFlow
               </span>
-              <span className="text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+              <span className="text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 P2P
               </span>
             </div>
@@ -63,13 +63,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1 bg-slate-900/60 p-1 rounded-2xl border border-slate-800/70">
+        <nav className="hidden md:flex items-center gap-1 bg-neutral-900/80 p-1 rounded-2xl border border-neutral-800">
           <button
             onClick={() => onNavigate('create')}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
               currentView === 'create'
-                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
-                : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-emerald-500 text-black font-bold shadow-md shadow-emerald-500/20'
+                : 'text-neutral-300 hover:text-white hover:bg-neutral-800/60'
             }`}
           >
             <Send className="w-3.5 h-3.5" />
@@ -80,8 +80,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => onNavigate('receive')}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
               currentView === 'receive'
-                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
-                : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-emerald-500 text-black font-bold shadow-md shadow-emerald-500/20'
+                : 'text-neutral-300 hover:text-white hover:bg-neutral-800/60'
             }`}
           >
             <Download className="w-3.5 h-3.5" />
@@ -90,9 +90,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={onOpenScanner}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-neutral-300 hover:text-white hover:bg-neutral-800/60 transition-all"
           >
-            <QrCode className="w-3.5 h-3.5 text-indigo-400" />
+            <QrCode className="w-3.5 h-3.5 text-emerald-400" />
             <span>Scan QR</span>
           </button>
 
@@ -100,8 +100,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => onNavigate('history')}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
               currentView === 'history'
-                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
-                : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-emerald-500 text-black font-bold shadow-md shadow-emerald-500/20'
+                : 'text-neutral-300 hover:text-white hover:bg-neutral-800/60'
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
@@ -112,7 +112,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right Action Icons: Online Status, PWA Install, User Profile / Auth */}
         <div className="flex items-center gap-3">
           {/* Online status indicator */}
-          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] font-medium text-slate-400">
+          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-[11px] font-medium text-neutral-400">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>Online</span>
           </div>
@@ -125,9 +125,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-white transition-all"
+                className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs text-white transition-all"
               >
-                <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-500 flex items-center justify-center font-bold text-white text-[11px]">
+                <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center font-bold text-black text-[11px]">
                   {user.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
                 </div>
                 <span className="hidden sm:inline font-medium max-w-[100px] truncate">
@@ -137,12 +137,12 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               {userMenuOpen && (
                 <div 
-                  className="absolute right-0 mt-2 w-48 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl py-1.5 z-50 text-xs animate-in fade-in slide-in-from-top-2"
+                  className="absolute right-0 mt-2 w-48 rounded-2xl bg-neutral-950 border border-neutral-800 shadow-2xl py-1.5 z-50 text-xs animate-in fade-in slide-in-from-top-2"
                   onMouseLeave={() => setUserMenuOpen(false)}
                 >
-                  <div className="px-3 py-2 border-b border-slate-800">
+                  <div className="px-3 py-2 border-b border-neutral-800">
                     <p className="font-semibold text-white truncate">{user.displayName || 'ShareFlow User'}</p>
-                    <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+                    <p className="text-[11px] text-neutral-400 truncate">{user.email}</p>
                   </div>
 
                   <button
@@ -150,9 +150,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setUserMenuOpen(false);
                       onNavigate('dashboard');
                     }}
-                    className="w-full text-left px-3 py-2 hover:bg-slate-800 text-slate-200 flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 hover:bg-neutral-900 text-neutral-200 flex items-center gap-2"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
                     <span>Dashboard</span>
                   </button>
 
@@ -161,9 +161,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setUserMenuOpen(false);
                       onNavigate('profile');
                     }}
-                    className="w-full text-left px-3 py-2 hover:bg-slate-800 text-slate-200 flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 hover:bg-neutral-900 text-neutral-200 flex items-center gap-2"
                   >
-                    <UserIcon className="w-3.5 h-3.5 text-indigo-400" />
+                    <UserIcon className="w-3.5 h-3.5 text-teal-400" />
                     <span>Profile</span>
                   </button>
 
@@ -172,13 +172,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setUserMenuOpen(false);
                       onNavigate('settings');
                     }}
-                    className="w-full text-left px-3 py-2 hover:bg-slate-800 text-slate-200 flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 hover:bg-neutral-900 text-neutral-200 flex items-center gap-2"
                   >
-                    <Settings className="w-3.5 h-3.5 text-slate-400" />
+                    <Settings className="w-3.5 h-3.5 text-neutral-400" />
                     <span>Settings</span>
                   </button>
 
-                  <div className="border-t border-slate-800 my-1" />
+                  <div className="border-t border-neutral-800 my-1" />
 
                   <button
                     onClick={async () => {
@@ -197,9 +197,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : (
             <button
               onClick={onOpenAuth}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-slate-200 hover:text-white transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs font-semibold text-neutral-200 hover:text-white transition-all"
             >
-              <LogIn className="w-3.5 h-3.5 text-cyan-400" />
+              <LogIn className="w-3.5 h-3.5 text-emerald-400" />
               <span>Sign In</span>
             </button>
           )}
@@ -207,7 +207,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Mobile menu hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white"
+            className="md:hidden p-2 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -216,15 +216,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-slate-950 border-b border-slate-800 px-4 py-3 space-y-2 animate-in slide-in-from-top-4">
+        <div className="md:hidden bg-black border-b border-neutral-900 px-4 py-3 space-y-2 animate-in slide-in-from-top-4">
           <button
             onClick={() => {
               setMobileMenuOpen(false);
               onNavigate('create');
             }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-900"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-200 hover:bg-neutral-900"
           >
-            <Send className="w-4 h-4 text-cyan-400" />
+            <Send className="w-4 h-4 text-emerald-400" />
             <span>Send Files</span>
           </button>
 
@@ -233,7 +233,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               setMobileMenuOpen(false);
               onNavigate('receive');
             }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-900"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-200 hover:bg-neutral-900"
           >
             <Download className="w-4 h-4 text-emerald-400" />
             <span>Receive Files</span>
@@ -244,9 +244,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               setMobileMenuOpen(false);
               onOpenScanner();
             }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-900"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-200 hover:bg-neutral-900"
           >
-            <QrCode className="w-4 h-4 text-indigo-400" />
+            <QrCode className="w-4 h-4 text-teal-400" />
             <span>Scan QR Code</span>
           </button>
 
@@ -255,9 +255,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               setMobileMenuOpen(false);
               onNavigate('history');
             }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-900"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-200 hover:bg-neutral-900"
           >
-            <Clock className="w-4 h-4 text-purple-400" />
+            <Clock className="w-4 h-4 text-emerald-400" />
             <span>Transfer History</span>
           </button>
 
@@ -267,7 +267,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setMobileMenuOpen(false);
                 onNavigate('dashboard');
               }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-900"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-200 hover:bg-neutral-900"
             >
               <Sparkles className="w-4 h-4 text-amber-400" />
               <span>User Dashboard</span>

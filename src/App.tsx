@@ -13,6 +13,7 @@ import { ProfileView } from './views/ProfileView.tsx';
 import { SettingsView } from './views/SettingsView.tsx';
 import { ScannerModal } from './views/ScannerModal.tsx';
 import { AuthModal } from './views/AuthModal.tsx';
+import { Footer } from './components/Footer.tsx';
 import { ShareSession } from './types.ts';
 
 export default function App() {
@@ -113,7 +114,7 @@ export default function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+        <div className="min-h-screen bg-black text-neutral-100 flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-200">
           
           {/* Universal Sticky Navigation */}
           <Navbar
@@ -200,6 +201,9 @@ export default function App() {
             onClose={() => setIsAuthOpen(false)}
             onSuccess={() => navigateTo('dashboard')}
           />
+
+          {/* Global Footer with Developer Attribution */}
+          <Footer />
 
         </div>
       </ToastProvider>
