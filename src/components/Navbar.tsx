@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 import { PWAInstallButton } from './PWAInstallButton.tsx';
+import { LogoAnimationVideo } from './GhibliArt.tsx';
 
 interface NavbarProps {
   currentView: string;
@@ -37,16 +38,12 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-black/90 border-b border-neutral-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
-        {/* Brand Logo */}
+        {/* Brand Logo with Live Looping Video Animation */}
         <div 
           onClick={() => onNavigate('landing')}
           className="flex items-center gap-3 cursor-pointer group"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 p-[2px] shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/40 transition-all duration-300">
-            <div className="w-full h-full bg-black rounded-[10px] flex items-center justify-center">
-              <Share2 className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
-            </div>
-          </div>
+          <LogoAnimationVideo size="md" className="rounded-xl ring-2 ring-emerald-500/30 group-hover:ring-emerald-400/60 transition-all duration-300" />
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-bold text-lg tracking-tight text-white group-hover:text-emerald-300 transition-colors">
@@ -56,7 +53,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 P2P
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 hidden sm:block -mt-1 font-mono">
+            <p className="text-[10px] text-neutral-400 hidden sm:block -mt-1 font-mono">
               Fast · Private · 10m Expiry
             </p>
           </div>

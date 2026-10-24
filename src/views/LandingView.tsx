@@ -36,10 +36,10 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigate, onOpenScan
       {/* Hero Section */}
       <section className="relative max-w-5xl mx-auto px-4 pt-10 sm:pt-16 pb-12 text-center">
         
-        {/* Animated Studio Ghibli Mascot Showcase */}
+        {/* Live Looping Video Animation Showcase */}
         <div className="mb-6 inline-block">
           <div className="bg-neutral-950/90 p-4 rounded-3xl border border-neutral-800 shadow-2xl backdrop-blur-md">
-            <GhibliDancingDuo label="Meet Ren & Aoi · Your Studio Ghibli P2P Transfer Companions!" />
+            <GhibliDancingDuo label="Fast, Private & Direct P2P Transfer · Instant Live Stream" />
           </div>
         </div>
 

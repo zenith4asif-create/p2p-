@@ -515,10 +515,10 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
           </div>
         )}
 
-        {/* Dancing Ghibli Animation during connection or transfer */}
+        {/* Live Transfer Video Animation during connection or transfer */}
         {(p2pState === 'transferring' || p2pState === 'connected' || p2pState === 'connecting') && (
-          <div className="mb-4 bg-slate-950/60 rounded-2xl border border-emerald-500/30 overflow-hidden">
-            <GhibliDancingDuo label="Receiving stream active · Two Ghibli spirits dancing together!" />
+          <div className="mb-4 bg-neutral-950 rounded-2xl border border-emerald-500/30 overflow-hidden">
+            <GhibliDancingDuo label="Receiving stream active · Encrypted peer transfer in progress" />
           </div>
         )}
 

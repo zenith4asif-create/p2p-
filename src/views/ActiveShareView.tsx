@@ -412,9 +412,9 @@ export const ActiveShareView: React.FC<ActiveShareViewProps> = ({
                         <p className="text-xs text-neutral-400">Scan the QR code or enter code {currentShare.code} on another device.</p>
                       </div>
                     </div>
-                    {/* Ghibli Mascots Dancing while waiting */}
+                    {/* Live Video Loop while waiting */}
                     <div className="bg-neutral-950 rounded-2xl border border-neutral-800/90 overflow-hidden my-2">
-                      <GhibliDancingDuo label="Ren & Aoi are dancing while waiting for receiver to connect..." compact={true} />
+                      <GhibliDancingDuo label="Waiting for receiver to connect · Live peer loop active" compact={true} />
                     </div>
                   </div>
                 )}
@@ -429,7 +429,7 @@ export const ActiveShareView: React.FC<ActiveShareViewProps> = ({
                       </div>
                     </div>
                     <div className="bg-neutral-950 rounded-2xl border border-neutral-800/90 overflow-hidden my-2">
-                      <GhibliDancingDuo label="Receiver connected! Mascots dancing enthusiastically..." compact={true} />
+                      <GhibliDancingDuo label="Receiver connected · Secure channel established" compact={true} />
                     </div>
                   </div>
                 )}
@@ -454,7 +454,7 @@ export const ActiveShareView: React.FC<ActiveShareViewProps> = ({
                       </div>
                     </div>
                     <div className="bg-neutral-950 rounded-2xl border border-emerald-500/30 overflow-hidden my-2">
-                      <GhibliDancingDuo label="Streaming files to receiver · Ren & Aoi dancing joyfully!" compact={true} />
+                      <GhibliDancingDuo label="Streaming files to receiver · Live transfer in progress" compact={true} />
                     </div>
                   </div>
                 )}
@@ -462,7 +462,7 @@ export const ActiveShareView: React.FC<ActiveShareViewProps> = ({
                 {p2pState === 'completed' && (
                   <div className="w-full text-center py-2">
                     <div className="bg-neutral-950 rounded-2xl border border-emerald-500/30 overflow-hidden mb-3">
-                      <GhibliDancingDuo label="🎉 All files delivered! Ren & Aoi cheering!" compact={true} />
+                      <GhibliDancingDuo label="🎉 All files delivered successfully!" compact={true} />
                     </div>
                     <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight">
                       🎉 SUCCESSFULLY TRANSFERRED ALL FILES!
