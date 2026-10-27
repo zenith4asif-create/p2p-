@@ -477,8 +477,8 @@ export const FullScreenSuccessModal: React.FC<{
         ))}
       </div>
 
-      {/* Main Pitch-Black Container */}
-      <div className="relative w-full max-w-xl rounded-3xl bg-neutral-950 border border-neutral-800 p-6 sm:p-8 shadow-2xl text-center z-10">
+      {/* Main Liquid Transparent Glass Container ("aar paar dikha" translucent refraction) */}
+      <div className="relative w-full max-w-xl rounded-3xl liquid-glass-card p-6 sm:p-8 shadow-2xl text-center z-10">
         
         {/* Successful Transfer Live Video in Infinite Loop with Fast Preload */}
         <div className="relative rounded-2xl overflow-hidden border border-emerald-500/40 bg-black shadow-2xl max-w-[340px] w-full aspect-video mx-auto mb-4 transform-gpu">
@@ -494,7 +494,7 @@ export const FullScreenSuccessModal: React.FC<{
             onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
             className="w-full h-full object-cover"
           />
-          <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/85 backdrop-blur-md border border-emerald-500/40 text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1 shadow-md">
+          <div className="absolute top-2 right-2 px-2.5 py-0.5 rounded-full liquid-glass-panel border-emerald-500/40 text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1 shadow-md">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
             <span>COMPLETE</span>
           </div>
@@ -502,38 +502,38 @@ export const FullScreenSuccessModal: React.FC<{
 
         {/* Big Bold Headline Requested by User */}
         <div className="mb-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <div className="flex items-center justify-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider mb-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Transfer Complete ✓</span>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight uppercase leading-snug">
+          <h1 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight uppercase leading-snug">
             🎉 SUCCESSFULLY RECEIVED ALL FILES!
           </h1>
           
-          <p className="text-base sm:text-lg font-bold text-emerald-400 mt-1">
+          <p className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-300 mt-1">
             THANKS FOR USING SHAREFLOW
           </p>
-          <p className="text-xs text-neutral-400 mt-1 font-mono">
+          <p className="text-xs text-slate-600 dark:text-neutral-300 mt-1 font-mono">
             "Share Anything. Scan. Transfer. Done."
           </p>
         </div>
 
-        {/* Received Files Summary Card */}
-        <div className="bg-black rounded-2xl border border-neutral-800 p-4 text-left mb-6 max-h-44 overflow-y-auto">
-          <div className="flex items-center justify-between pb-2 border-b border-neutral-800 mb-2 text-xs font-bold text-neutral-400">
+        {/* Received Files Summary Card (iOS Liquid Transparent Glass) */}
+        <div className="liquid-glass-input rounded-2xl p-4 text-left mb-6 max-h-44 overflow-y-auto">
+          <div className="flex items-center justify-between pb-2 border-b border-black/10 dark:border-white/10 mb-2 text-xs font-bold text-slate-700 dark:text-neutral-300">
             <span>Received Package ({files.length} {files.length === 1 ? 'file' : 'files'})</span>
-            <span className="font-mono text-emerald-400">{formatBytes(totalBytes)}</span>
+            <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{formatBytes(totalBytes)}</span>
           </div>
 
           <div className="space-y-1.5">
             {files.map((file, idx) => (
               <div key={idx} className="flex items-center justify-between text-xs py-1">
                 <div className="flex items-center gap-2 truncate pr-2">
-                  <FileCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span className="text-white truncate font-medium">{file.name}</span>
+                  <FileCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span className="text-slate-900 dark:text-white truncate font-medium">{file.name}</span>
                 </div>
-                <span className="font-mono text-neutral-400 text-[11px] shrink-0">
+                <span className="font-mono text-slate-500 dark:text-neutral-400 text-[11px] shrink-0">
                   {formatBytes(file.size)}
                 </span>
               </div>
@@ -544,15 +544,17 @@ export const FullScreenSuccessModal: React.FC<{
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
           <button
+            type="button"
             onClick={onClose}
-            className="w-full py-3.5 rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-neutral-200 font-bold text-xs border border-neutral-800 transition active:scale-95"
+            className="w-full min-h-[48px] rounded-2xl liquid-glass-button text-slate-800 dark:text-neutral-200 font-bold text-xs shadow-sm active:scale-95 transition-transform"
           >
             Review Files
           </button>
 
           <button
+            type="button"
             onClick={onGoHome}
-            className="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs shadow-xl shadow-emerald-500/20 transition flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full min-h-[48px] rounded-2xl liquid-glass-accent text-white font-black text-xs shadow-xl shadow-emerald-500/25 transition flex items-center justify-center gap-2 active:scale-95"
           >
             <Home className="w-4 h-4 stroke-[2.5]" />
             <span>FINISH &amp; BACK TO HOME</span>
@@ -560,16 +562,16 @@ export const FullScreenSuccessModal: React.FC<{
         </div>
 
         {/* Developer Credit Requested by User */}
-        <div className="pt-4 border-t border-neutral-900 text-center text-xs text-neutral-500">
-          <p className="font-medium text-neutral-400">
-            Engineered by <span className="font-bold text-white">ASIF ANSARI</span>
+        <div className="pt-4 border-t border-black/10 dark:border-white/10 text-center text-xs text-slate-500 dark:text-neutral-400">
+          <p className="font-medium text-slate-600 dark:text-neutral-300">
+            Engineered by <span className="font-bold text-slate-900 dark:text-white">ASIF ANSARI</span>
           </p>
-          <p className="text-[11px] text-neutral-500 mt-0.5">
+          <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-0.5">
             (independent technologist researcher and biologist)
           </p>
           <a
             href="mailto:bioasif77@gmail.com"
-            className="inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-mono text-[11px] mt-1.5 transition"
+            className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-mono text-[11px] mt-1.5 transition"
           >
             <Mail className="w-3 h-3" />
             <span>Contact: bioasif77@gmail.com</span>

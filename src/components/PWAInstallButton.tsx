@@ -15,12 +15,13 @@ export const PWAInstallButton: React.FC = () => {
   if (isInstallable) {
     return (
       <button
+        type="button"
         onClick={install}
-        className="flex items-center gap-2 rounded-xl bg-cyan-600/90 hover:bg-cyan-500 text-white px-3.5 py-1.5 text-xs font-semibold shadow-md shadow-cyan-900/30 transition-all hover:scale-[1.02] active:scale-[0.98] border border-cyan-400/30"
+        className="min-h-[44px] flex items-center gap-2 rounded-xl liquid-glass-accent text-white px-3.5 py-1.5 text-xs font-black shadow-lg shadow-emerald-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
         title="Install ShareFlow as a native PWA"
       >
-        <Download className="w-3.5 h-3.5" />
-        <span>Install App</span>
+        <Download className="w-3.5 h-3.5 stroke-[2.5]" />
+        <span className="hidden sm:inline">Install App</span>
       </button>
     );
   }
@@ -30,35 +31,38 @@ export const PWAInstallButton: React.FC = () => {
     return (
       <>
         <button
+          type="button"
           onClick={() => setShowIOSGuide(true)}
-          className="flex items-center gap-1.5 rounded-xl border border-slate-700/80 bg-slate-800/60 hover:bg-slate-700/60 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition"
+          className="min-h-[44px] flex items-center gap-1.5 rounded-xl liquid-glass-button px-3.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-neutral-200 hover:text-slate-950 dark:hover:text-white transition shadow-sm"
         >
-          <Download className="w-3.5 h-3.5 text-cyan-400" />
+          <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
           <span>Install</span>
         </button>
 
         {showIOSGuide && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <div className="w-full max-w-sm rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-2xl animate-in zoom-in-95">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-2xl p-4 select-none">
+            <div className="w-full max-w-sm rounded-3xl liquid-glass-card p-6 shadow-2xl animate-in zoom-in-95">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="text-base font-semibold text-white flex items-center gap-2">
-                  <Share2 className="w-4 h-4 text-cyan-400" /> Install on iOS
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Share2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Install on iOS
                 </h3>
                 <button
+                  type="button"
                   onClick={() => setShowIOSGuide(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                  className="min-h-[36px] min-w-[36px] p-1 rounded-xl liquid-glass-button text-slate-500 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition shadow-sm"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed mb-4">
-                1. Tap the <strong className="text-white">Share</strong> button in Safari's bottom toolbar.<br />
-                2. Scroll down and tap <strong className="text-white">Add to Home Screen</strong>.<br />
+              <p className="text-xs text-slate-600 dark:text-neutral-300 leading-relaxed mb-4">
+                1. Tap the <strong className="text-slate-900 dark:text-white">Share</strong> button in Safari's bottom toolbar.<br />
+                2. Scroll down and tap <strong className="text-slate-900 dark:text-white">Add to Home Screen</strong>.<br />
                 3. Enjoy instant launch and full-screen file sharing!
               </p>
               <button
+                type="button"
                 onClick={() => setShowIOSGuide(false)}
-                className="w-full rounded-xl bg-slate-800 py-2.5 text-xs font-semibold text-white hover:bg-slate-700 transition"
+                className="w-full min-h-[44px] rounded-2xl liquid-glass-accent text-white font-black py-2.5 text-xs transition shadow-md active:scale-95"
               >
                 Got it
               </button>

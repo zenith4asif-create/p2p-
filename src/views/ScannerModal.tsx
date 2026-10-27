@@ -91,15 +91,15 @@ export const ScannerModal: React.FC<ScannerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in">
-      <div className="relative w-full max-w-md rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-2xl p-4 animate-in fade-in select-none">
+      <div className="relative w-full max-w-md rounded-3xl liquid-glass-card shadow-2xl overflow-hidden">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-950/60">
+        <div className="flex items-center justify-between p-4 border-b border-black/10 dark:border-white/10 liquid-glass-nav">
           <div className="flex items-center gap-2">
-            <Camera className="w-5 h-5 text-cyan-400" />
-            <span className="font-bold text-sm text-white">Scan ShareFlow QR</span>
-            <span className="text-[10px] uppercase font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+            <Camera className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <span className="font-bold text-sm text-slate-900 dark:text-white">Scan ShareFlow QR</span>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
               <Zap className="w-2.5 h-2.5" /> 60 FPS
             </span>
           </div>
@@ -107,21 +107,25 @@ export const ScannerModal: React.FC<ScannerModalProps> = ({
           <div className="flex items-center gap-2">
             {controls?.hasTorch && (
               <button
+                type="button"
                 onClick={handleToggleTorch}
-                className={`p-2 rounded-xl border transition ${
+                className={`min-h-[40px] min-w-[40px] p-2 rounded-xl border transition flex items-center justify-center ${
                   isTorchOn 
-                    ? 'bg-amber-500/20 border-amber-500 text-amber-300' 
-                    : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'
+                    ? 'bg-amber-500/20 border-amber-500 text-amber-500' 
+                    : 'liquid-glass-button text-slate-700 dark:text-neutral-300 hover:text-slate-950 dark:hover:text-white'
                 }`}
                 title="Toggle Torch"
+                aria-label="Toggle flashlight"
               >
                 <Flashlight className="w-4 h-4" />
               </button>
             )}
 
             <button
+              type="button"
               onClick={onClose}
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition"
+              className="min-h-[40px] min-w-[40px] p-2 rounded-xl liquid-glass-button text-slate-700 dark:text-neutral-300 hover:text-slate-950 dark:hover:text-white flex items-center justify-center"
+              aria-label="Close scanner"
             >
               <X className="w-4 h-4" />
             </button>
@@ -134,25 +138,27 @@ export const ScannerModal: React.FC<ScannerModalProps> = ({
             <div className="p-6 text-center">
               <AlertCircle className="w-12 h-12 text-amber-400 mx-auto mb-3" />
               <h3 className="font-bold text-white text-base mb-1">Camera Access Blocked</h3>
-              <p className="text-xs text-slate-400 mb-6 leading-relaxed">
+              <p className="text-xs text-neutral-300 mb-6 leading-relaxed">
                 Camera permission was denied. You can upload a QR screenshot or enter the 6-character code manually.
               </p>
               
               <div className="space-y-2">
                 <button
+                  type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition flex items-center justify-center gap-2"
+                  className="w-full min-h-[44px] rounded-2xl liquid-glass-button text-white font-bold text-xs flex items-center justify-center gap-2"
                 >
-                  <Upload className="w-4 h-4 text-cyan-400" />
+                  <Upload className="w-4 h-4 text-emerald-400" />
                   <span>Upload QR Screenshot</span>
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => {
                     onClose();
                     onManualEntry();
                   }}
-                  className="w-full py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-1.5"
+                  className="w-full min-h-[44px] rounded-2xl liquid-glass-accent text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-md"
                 >
                   <span>Enter Code Manually</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -171,15 +177,15 @@ export const ScannerModal: React.FC<ScannerModalProps> = ({
 
               {/* Targeting Reticle Frame */}
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                <div className="relative w-60 h-60 rounded-3xl border-2 border-cyan-400 shadow-[0_0_0_9999px_rgba(0,0,0,0.55)]">
+                <div className="relative w-60 h-60 rounded-3xl border-2 border-emerald-400/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.6)]">
                   {/* Corner accents */}
-                  <div className="absolute -top-1 -left-1 w-7 h-7 border-t-4 border-l-4 border-cyan-400 rounded-tl-xl" />
-                  <div className="absolute -top-1 -right-1 w-7 h-7 border-t-4 border-r-4 border-cyan-400 rounded-tr-xl" />
-                  <div className="absolute -bottom-1 -left-1 w-7 h-7 border-b-4 border-l-4 border-cyan-400 rounded-bl-xl" />
-                  <div className="absolute -bottom-1 -right-1 w-7 h-7 border-b-4 border-r-4 border-cyan-400 rounded-br-xl" />
+                  <div className="absolute -top-1 -left-1 w-7 h-7 border-t-4 border-l-4 border-emerald-400 rounded-tl-xl" />
+                  <div className="absolute -top-1 -right-1 w-7 h-7 border-t-4 border-r-4 border-emerald-400 rounded-tr-xl" />
+                  <div className="absolute -bottom-1 -left-1 w-7 h-7 border-b-4 border-l-4 border-emerald-400 rounded-bl-xl" />
+                  <div className="absolute -bottom-1 -right-1 w-7 h-7 border-b-4 border-r-4 border-emerald-400 rounded-br-xl" />
 
                   {/* High-speed scanning laser */}
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-300 to-transparent animate-pulse shadow-md shadow-cyan-400" />
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-300 to-transparent animate-pulse shadow-md shadow-emerald-400" />
                 </div>
               </div>
             </>
@@ -196,31 +202,33 @@ export const ScannerModal: React.FC<ScannerModalProps> = ({
         />
 
         {/* Footer controls */}
-        <div className="p-4 bg-slate-950/80 text-center border-t border-slate-800 space-y-2.5">
+        <div className="p-4 liquid-glass-panel text-center border-t border-black/10 dark:border-white/10 space-y-2.5">
           <div className="flex items-center justify-between gap-2">
             <button
+              type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isDecodingFile}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition"
+              className="flex-1 min-h-[44px] flex items-center justify-center gap-1.5 rounded-2xl liquid-glass-button text-slate-800 dark:text-neutral-200 text-xs font-semibold shadow-sm"
             >
-              <ImageIcon className="w-3.5 h-3.5 text-cyan-400" />
-              <span>{isDecodingFile ? 'Decoding...' : 'Photo / Screenshot'}</span>
+              <ImageIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>{isDecodingFile ? 'Decoding...' : 'Photo / File'}</span>
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 onClose();
                 onManualEntry();
               }}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition"
+              className="flex-1 min-h-[44px] flex items-center justify-center gap-1.5 rounded-2xl liquid-glass-button text-slate-800 dark:text-neutral-200 text-xs font-semibold shadow-sm"
             >
               <span>Type Code</span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 dark:text-neutral-400" />
             </button>
           </div>
 
-          <p className="text-[11px] text-slate-400">
-            Center the QR code in the frame for instant hardware-accelerated detection.
+          <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-mono">
+            Position QR code within frame for instant automatic detection.
           </p>
         </div>
 

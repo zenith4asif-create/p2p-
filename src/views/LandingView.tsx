@@ -5,15 +5,12 @@ import {
   QrCode, 
   Zap, 
   Clock, 
-  Cloud, 
-  Layers, 
-  ArrowRight,
-  FileCheck2,
-  Lock,
-  Smartphone,
-  Sparkles
+  ShieldCheck, 
+  ArrowRight
 } from 'lucide-react';
 import { GhibliDancingDuo } from '../components/GhibliArt.tsx';
+import { RGBLightBox } from '../components/RGBLightBox.tsx';
+import { triggerHaptic } from '../utils/haptics.ts';
 
 interface LandingViewProps {
   onNavigate: (view: string, param?: string) => void;
@@ -23,193 +20,167 @@ interface LandingViewProps {
 export const LandingView: React.FC<LandingViewProps> = ({ onNavigate, onOpenScanner }) => {
   const [quickCode, setQuickCode] = useState('');
 
+  const handleAction = (cb: () => void) => {
+    // Only vibrate on tap
+    triggerHaptic('selection');
+    cb();
+  };
+
   const handleQuickReceive = (e: React.FormEvent) => {
     e.preventDefault();
     if (quickCode.trim().length >= 4) {
+      triggerHaptic('selection');
       onNavigate('receive', quickCode.trim().toUpperCase());
     }
   };
 
   return (
-    <div className="relative overflow-hidden min-h-[calc(100vh-4rem)] flex flex-col justify-between bg-black text-neutral-100">
+    <div className="relative w-full flex flex-col justify-between select-none">
       
       {/* Hero Section */}
-      <section className="relative max-w-5xl mx-auto px-4 pt-10 sm:pt-16 pb-12 text-center">
+      <section className="relative max-w-5xl mx-auto px-4 pt-6 sm:pt-12 pb-8 sm:pb-14 text-center">
         
-        {/* Live Looping Video Animation Showcase */}
-        <div className="mb-6 inline-block">
-          <div className="bg-neutral-950/90 p-4 rounded-3xl border border-neutral-800 shadow-2xl backdrop-blur-md">
+        {/* Live Looping Video Animation Showcase with Running RGB Light Outline Box */}
+        <div className="mb-6 inline-block w-full max-w-sm sm:max-w-md mx-auto">
+          <RGBLightBox className="w-full" innerClassName="p-3 sm:p-4">
             <GhibliDancingDuo label="Fast, Private & Direct P2P Transfer · Instant Live Stream" />
-          </div>
+          </RGBLightBox>
         </div>
 
-        {/* Modern Pill Tag */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neutral-950 border border-neutral-800 shadow-inner mb-6 animate-in fade-in slide-in-from-bottom-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <span className="text-xs font-semibold text-neutral-300">
-            Next-Gen Browser P2P &amp; Cloud Transfer
-          </span>
-          <span className="text-neutral-600">|</span>
-          <span className="text-xs font-mono text-emerald-400">Zero Server Data Retention</span>
+        {/* Unboxed Status Metadata */}
+        <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-slate-600 dark:text-neutral-300 font-medium mb-4">
+          <span className="text-emerald-600 dark:text-emerald-400 font-bold">Next-Gen Browser P2P</span>
+          <span aria-hidden="true" className="text-slate-400 dark:text-neutral-600">·</span>
+          <span>Zero Server Retention</span>
+          <span aria-hidden="true" className="text-slate-400 dark:text-neutral-600">·</span>
+          <span className="font-mono text-emerald-600 dark:text-emerald-300 font-bold">10-Minute Hard Expiry</span>
         </div>
 
-        {/* Hero Title */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white uppercase leading-[1.1] mb-6">
+        {/* Hero Title with Dual Theme Gradient */}
+        <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white uppercase leading-[1.08] mb-4 sm:mb-6 max-w-3xl mx-auto">
           SHARE ANYTHING. <br />
-          <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-            ANYWHERE.
+          <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-600 dark:from-emerald-300 dark:via-teal-200 dark:to-cyan-300 bg-clip-text text-transparent">
+            INSTANTLY AROUND YOU.
           </span>
         </h1>
 
         {/* Hero Subtitle */}
-        <p className="max-w-2xl mx-auto text-base sm:text-lg text-neutral-400 leading-relaxed mb-10">
-          Fast, private and temporary file sharing using QR codes, short codes, links and direct browser-to-browser P2P transfer with automatic 10-minute expiry.
+        <p className="max-w-xl mx-auto text-sm sm:text-base text-slate-600 dark:text-neutral-300 leading-relaxed mb-8 px-2 font-normal">
+          High-speed, encrypted browser-to-browser P2P file sharing. Scan QR codes or enter short codes to stream files directly between devices with automatic 10-minute expiry.
         </p>
 
-        {/* Main Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-10">
+        {/* iOS-Style Tactile Liquid Glass Primary Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md sm:max-w-xl mx-auto mb-8 w-full px-2">
+          {/* Primary CTA: Send Files */}
           <button
-            onClick={() => onNavigate('create')}
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-sm shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/30 flex items-center justify-center gap-2.5 transition-all hover:scale-105 active:scale-95"
+            type="button"
+            onClick={() => handleAction(() => onNavigate('create'))}
+            className="w-full sm:w-auto flex-1 min-h-[50px] px-6 py-3.5 rounded-2xl liquid-glass-accent text-white font-black text-sm flex items-center justify-center gap-2.5 transition-all active:scale-95 shadow-lg shadow-emerald-500/25"
           >
             <Send className="w-4 h-4 stroke-[2.5]" />
             <span>SEND FILES</span>
           </button>
 
+          {/* Secondary CTA: Receive Files */}
           <button
-            onClick={() => onNavigate('receive')}
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-sm border border-neutral-800 shadow-lg flex items-center justify-center gap-2.5 transition-all hover:scale-105 active:scale-95"
+            type="button"
+            onClick={() => handleAction(() => onNavigate('receive'))}
+            className="w-full sm:w-auto flex-1 min-h-[50px] px-6 py-3.5 rounded-2xl liquid-glass-button text-slate-900 dark:text-white font-bold text-sm flex items-center justify-center gap-2.5 transition-all active:scale-95 shadow-md"
           >
-            <Download className="w-4 h-4 text-emerald-400 stroke-[2.5]" />
+            <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
             <span>RECEIVE FILES</span>
           </button>
 
+          {/* Tertiary Action: Quick Scan */}
           <button
-            onClick={onOpenScanner}
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-sm border border-neutral-800 shadow-lg flex items-center justify-center gap-2.5 transition-all hover:scale-105 active:scale-95 group"
+            type="button"
+            onClick={() => handleAction(onOpenScanner)}
+            className="w-full sm:w-auto min-h-[50px] px-5 py-3.5 rounded-2xl liquid-glass-button text-slate-900 dark:text-white font-bold text-sm flex items-center justify-center gap-2.5 transition-all active:scale-95 shadow-md"
           >
-            <QrCode className="w-4 h-4 text-emerald-400 group-hover:rotate-12 transition-transform duration-300 stroke-[2.5]" />
+            <QrCode className="w-4 h-4 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
             <span>SCAN QR</span>
           </button>
         </div>
 
-        {/* Quick Short Code Input */}
-        <div className="max-w-md mx-auto">
-          <form 
-            onSubmit={handleQuickReceive}
-            className="flex items-center gap-2 bg-neutral-950 p-2.5 rounded-2xl border border-neutral-800 focus-within:border-emerald-500 shadow-xl transition-all"
-          >
-            <div className="pl-3 text-neutral-500 font-mono text-sm font-semibold">#</div>
-            <input
-              type="text"
-              placeholder="ENTER 6-DIGIT CODE (e.g. A7K92P)"
-              value={quickCode}
-              onChange={(e) => setQuickCode(e.target.value.toUpperCase().slice(0, 6))}
-              className="w-full bg-transparent text-sm font-mono tracking-wider text-white placeholder-neutral-500 focus:outline-none uppercase"
-            />
-            <button
-              type="submit"
-              disabled={quickCode.trim().length < 4}
-              className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black disabled:opacity-40 disabled:hover:bg-neutral-800 disabled:hover:text-neutral-500 text-xs font-black transition-all flex items-center gap-1.5 shrink-0"
+        {/* Quick Short Code Input with Continuous Running RGB Light Outline */}
+        <div className="max-w-md mx-auto w-full px-2">
+          <RGBLightBox className="w-full" innerClassName="p-1.5 sm:p-2">
+            <form 
+              onSubmit={handleQuickReceive}
+              className="flex items-center gap-2"
             >
-              <span>Join</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </form>
+              <div className="pl-3 text-slate-500 dark:text-neutral-400 font-mono text-sm font-bold">#</div>
+              <input
+                type="text"
+                placeholder="ENTER 6-DIGIT CODE (e.g. A7K92P)"
+                value={quickCode}
+                onChange={(e) => setQuickCode(e.target.value.toUpperCase().slice(0, 6))}
+                className="w-full bg-transparent text-sm font-mono tracking-wider text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-neutral-500 focus:outline-none uppercase py-2"
+              />
+              <button
+                type="submit"
+                disabled={quickCode.trim().length < 4}
+                className="min-h-[44px] px-5 rounded-xl liquid-glass-accent text-white disabled:opacity-40 disabled:hover:opacity-40 text-xs font-black transition-all flex items-center gap-1.5 shrink-0 shadow-md"
+              >
+                <span>Join</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </form>
+          </RGBLightBox>
         </div>
 
       </section>
 
-      {/* Features Grid in True Dark Black */}
-      <section className="max-w-6xl mx-auto px-4 py-12 border-t border-neutral-900 w-full">
-        <div className="text-center mb-10">
-          <h2 className="text-xs font-bold tracking-widest text-emerald-400 uppercase mb-2">
+      {/* Features Bento Grid in Liquid Transparent Glass */}
+      <section className="max-w-6xl mx-auto px-4 py-8 sm:py-12 w-full">
+        <div className="text-center mb-8">
+          <h2 className="text-xs font-bold tracking-widest text-emerald-600 dark:text-emerald-400 uppercase mb-1.5">
             Engineered for Speed &amp; Privacy
           </h2>
-          <p className="text-xl sm:text-2xl font-bold text-white">
+          <p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white">
             Everything you need for instant transfer
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
-          <div className="p-5 rounded-2xl bg-neutral-950 border border-neutral-850 hover:border-emerald-500/50 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
+          <div className="liquid-glass-card p-5 rounded-3xl hover:border-emerald-500/50 transition-all shadow-md">
+            <div className="w-10 h-10 rounded-2xl liquid-glass-button flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-4 shadow-sm">
               <Zap className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-bold text-white mb-1.5">Direct P2P WebRTC</h3>
-            <p className="text-xs text-neutral-400 leading-relaxed">
-              Transfers stream directly between browsers through encrypted DataChannels without file data touching intermediate servers.
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">Direct P2P WebRTC</h3>
+            <p className="text-xs text-slate-600 dark:text-neutral-300 leading-relaxed">
+              Files stream directly peer-to-peer between your devices at maximum Wi-Fi and 5G local speeds.
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-neutral-950 border border-neutral-850 hover:border-emerald-500/50 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 mb-4">
+          <div className="liquid-glass-card p-5 rounded-3xl hover:border-emerald-500/50 transition-all shadow-md">
+            <div className="w-10 h-10 rounded-2xl liquid-glass-button flex items-center justify-center text-teal-600 dark:text-teal-400 mb-4 shadow-sm">
               <QrCode className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-bold text-white mb-1.5">Instant QR Sharing</h3>
-            <p className="text-xs text-neutral-400 leading-relaxed">
-              Point your phone camera to scan and start downloading instantly without typing links or sharing personal accounts.
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">Fast QR &amp; Codes</h3>
+            <p className="text-xs text-slate-600 dark:text-neutral-300 leading-relaxed">
+              Instant mobile camera barcode scanning or simple 6-character memorable short codes.
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-neutral-950 border border-neutral-850 hover:border-emerald-500/50 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4">
+          <div className="liquid-glass-card p-5 rounded-3xl hover:border-emerald-500/50 transition-all shadow-md">
+            <div className="w-10 h-10 rounded-2xl liquid-glass-button flex items-center justify-center text-amber-600 dark:text-amber-400 mb-4 shadow-sm">
               <Clock className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-bold text-white mb-1.5">10-Minute Auto Expiry</h3>
-            <p className="text-xs text-neutral-400 leading-relaxed">
-              Every share self-destructs after exactly 10 minutes. Strictly validated on server and client to guarantee transient sharing.
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">10-Minute Ephemeral</h3>
+            <p className="text-xs text-slate-600 dark:text-neutral-300 leading-relaxed">
+              Automatic hard session wipe after 10 minutes. No lingering links or unwanted access.
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-neutral-950 border border-neutral-850 hover:border-emerald-500/50 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-4">
-              <Cloud className="w-5 h-5" />
+          <div className="liquid-glass-card p-5 rounded-3xl hover:border-emerald-500/50 transition-all shadow-md">
+            <div className="w-10 h-10 rounded-2xl liquid-glass-button flex items-center justify-center text-cyan-600 dark:text-cyan-400 mb-4 shadow-sm">
+              <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-bold text-white mb-1.5">Cloud Fallback</h3>
-            <p className="text-xs text-neutral-400 leading-relaxed">
-              If peer firewalls or NAT block direct connections, automatic Cloudinary temporary storage steps in seamlessly.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-neutral-950 border border-neutral-850 hover:border-emerald-500/50 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-4">
-              <Layers className="w-5 h-5" />
-            </div>
-            <h3 className="text-sm font-bold text-white mb-1.5">Universal File Support</h3>
-            <p className="text-xs text-neutral-400 leading-relaxed">
-              Images, 4K videos, audio tracks, PDFs, documents, APK files, ZIP archives, and source code.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-neutral-950 border border-neutral-850 hover:border-emerald-500/50 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mb-4">
-              <Lock className="w-5 h-5" />
-            </div>
-            <h3 className="text-sm font-bold text-white mb-1.5">Privacy By Design</h3>
-            <p className="text-xs text-neutral-400 leading-relaxed">
-              No tracking, no analytics telemetry, no long-term file retention. You retain complete sovereignty over your data.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-neutral-950 border border-neutral-850 hover:border-emerald-500/50 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
-              <Smartphone className="w-5 h-5" />
-            </div>
-            <h3 className="text-sm font-bold text-white mb-1.5">Mobile First &amp; PWA</h3>
-            <p className="text-xs text-neutral-400 leading-relaxed">
-              Touch-friendly, optimized for Android Chrome and iOS Safari, with native home-screen installation.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-neutral-950 border border-neutral-850 hover:border-emerald-500/50 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4">
-              <FileCheck2 className="w-5 h-5" />
-            </div>
-            <h3 className="text-sm font-bold text-white mb-1.5">Real Backpressure</h3>
-            <p className="text-xs text-neutral-400 leading-relaxed">
-              Chunked binary streaming prevents browser memory freezes, handling large gigabyte files cleanly.
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">Zero Retention</h3>
+            <p className="text-xs text-slate-600 dark:text-neutral-300 leading-relaxed">
+              Transferred data never touches a persistent database. Your files remain completely yours.
             </p>
           </div>
 

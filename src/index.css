@@ -1,5 +1,123 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* iOS Dynamic Theme Variables */
+:root {
+  --bg-main: #f3f6fa;
+  --text-main: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  
+  /* Colorless Liquid Transparent Glass Light Mode ("aar-paar dikhega" refractive pure glass) */
+  --glass-card-bg: rgba(255, 255, 255, 0.08);
+  --glass-card-border: rgba(255, 255, 255, 0.5);
+  --glass-card-border-top: rgba(255, 255, 255, 0.92);
+  --glass-card-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03), inset 0 1px 1px 0 rgba(255, 255, 255, 0.85);
+  
+  --glass-panel-bg: rgba(255, 255, 255, 0.06);
+  --glass-panel-border: rgba(255, 255, 255, 0.45);
+  --glass-panel-shadow: 0 20px 48px -10px rgba(15, 23, 42, 0.08), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+  
+  --glass-nav-bg: rgba(255, 255, 255, 0.35);
+  --glass-nav-border: rgba(255, 255, 255, 0.6);
+  
+  --glass-tabbar-bg: rgba(255, 255, 255, 0.45);
+  --glass-tabbar-border: rgba(255, 255, 255, 0.65);
+  
+  --glass-input-bg: rgba(255, 255, 255, 0.1);
+  --glass-input-border: rgba(203, 213, 225, 0.6);
+  
+  /* iOS Button Glass Light Mode */
+  --glass-btn-bg: rgba(255, 255, 255, 0.22);
+  --glass-btn-hover: rgba(255, 255, 255, 0.38);
+  --glass-btn-border: rgba(255, 255, 255, 0.7);
+  --glass-btn-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.05), inset 0 1px 1px 0 rgba(255, 255, 255, 0.85);
+  --glass-btn-text: #0f172a;
+}
+
+.dark {
+  --bg-main: #07090e;
+  --text-main: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  
+  /* Colorless Liquid Transparent Glass Dark Mode */
+  --glass-card-bg: rgba(255, 255, 255, 0.02);
+  --glass-card-border: rgba(255, 255, 255, 0.09);
+  --glass-card-border-top: rgba(255, 255, 255, 0.22);
+  --glass-card-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.65), inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+  
+  --glass-panel-bg: rgba(255, 255, 255, 0.015);
+  --glass-panel-border: rgba(255, 255, 255, 0.07);
+  --glass-panel-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+  
+  --glass-nav-bg: rgba(8, 10, 15, 0.35);
+  --glass-nav-border: rgba(255, 255, 255, 0.08);
+  
+  --glass-tabbar-bg: rgba(8, 10, 15, 0.45);
+  --glass-tabbar-border: rgba(255, 255, 255, 0.1);
+  
+  --glass-input-bg: rgba(255, 255, 255, 0.02);
+  --glass-input-border: rgba(255, 255, 255, 0.1);
+  
+  /* iOS Button Glass Dark Mode */
+  --glass-btn-bg: rgba(255, 255, 255, 0.04);
+  --glass-btn-hover: rgba(255, 255, 255, 0.08);
+  --glass-btn-border: rgba(255, 255, 255, 0.14);
+  --glass-btn-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.16);
+  --glass-btn-text: #f8fafc;
+}
+
+/* Liquid Floating Orbs & Mesh Gradient Animations */
+@keyframes liquidOrb1 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(80px, -60px) scale(1.15);
+  }
+  66% {
+    transform: translate(-50px, 50px) scale(0.9);
+  }
+}
+
+@keyframes liquidOrb2 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(-90px, 70px) scale(1.2);
+  }
+  66% {
+    transform: translate(60px, -40px) scale(0.85);
+  }
+}
+
+@keyframes liquidOrb3 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  40% {
+    transform: translate(70px, 90px) scale(1.1);
+  }
+  80% {
+    transform: translate(-80px, -30px) scale(0.95);
+  }
+}
+
+@keyframes liquidPulse {
+  0%, 100% {
+    opacity: 0.3;
+    filter: blur(80px);
+  }
+  50% {
+    opacity: 0.55;
+    filter: blur(100px);
+  }
+}
+
+/* Ghibli Animations */
 @keyframes ghibliConfettiFall {
   0% {
     transform: translateY(-20px) rotate(0deg);
@@ -124,4 +242,348 @@
     opacity: 0.1;
   }
 }
+
+/* Liquid Transparent Glass Utility Styles ("aar-paar dikha" refractive crystal colorless glassmorphism) */
+.liquid-glass-card {
+  background: var(--glass-card-bg);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid var(--glass-card-border);
+  border-top: 1px solid var(--glass-card-border-top);
+  box-shadow: var(--glass-card-shadow);
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.liquid-glass-panel {
+  background: var(--glass-panel-bg);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid var(--glass-panel-border);
+  border-top: 1px solid var(--glass-card-border-top);
+  box-shadow: var(--glass-panel-shadow);
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.liquid-glass-nav {
+  background: var(--glass-nav-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--glass-nav-border);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.liquid-glass-tabbar {
+  background: var(--glass-tabbar-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-top: 1px solid var(--glass-tabbar-border);
+  box-shadow: 0 -4px 24px -2px rgba(0, 0, 0, 0.06);
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.liquid-glass-input {
+  background: var(--glass-input-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--glass-input-border);
+  border-top: 1px solid var(--glass-card-border-top);
+  box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.liquid-glass-input:focus-within {
+  border-color: rgba(52, 211, 153, 0.7);
+  border-top-color: rgba(52, 211, 153, 0.95);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.25), inset 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* iOS Tactile Glass Buttons */
+.liquid-glass-button {
+  background: var(--glass-btn-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-btn-border);
+  border-top: 1px solid var(--glass-card-border-top);
+  box-shadow: var(--glass-btn-shadow);
+  color: var(--glass-btn-text);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-glass-button:hover {
+  background: var(--glass-btn-hover);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6px 20px -2px rgba(0, 0, 0, 0.12), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.liquid-glass-button:active {
+  transform: scale(0.97);
+}
+
+/* iOS Vibrant Accent Button */
+.liquid-glass-accent {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: 1px solid rgba(52, 211, 153, 0.5);
+  border-top: 1px solid rgba(167, 243, 208, 0.85);
+  box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.38), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+  color: #ffffff !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-glass-accent:hover {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  box-shadow: 0 12px 30px -4px rgba(16, 185, 129, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.7);
+}
+
+.liquid-glass-accent:active {
+  transform: scale(0.97);
+}
+
+/* Light Mode Typography Normalizer for seamless dual theme readability */
+html:not(.dark) .heading-contrast,
+html.light .heading-contrast {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .text-contrast,
+html.light .text-contrast {
+  color: #1e293b !important;
+}
+
+html:not(.dark) .subtext-contrast,
+html.light .subtext-contrast {
+  color: #475569 !important;
+}
+
+/* ==========================================================================
+   Continuous Moving RGB Outline & Sci-Fi Radar Engine
+   ========================================================================== */
+
+@keyframes rgbContinuousSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rgbGradientWave {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes radarBeamSweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes radarPingWave {
+  0% {
+    transform: scale(0.15);
+    opacity: 0.95;
+    border-width: 2.5px;
+  }
+  70% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: scale(1.65);
+    opacity: 0;
+    border-width: 0.5px;
+  }
+}
+
+@keyframes sciFiPulseGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.4)) drop-shadow(0 0 20px rgba(16, 185, 129, 0.3));
+    opacity: 0.9;
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(236, 72, 153, 0.6)) drop-shadow(0 0 35px rgba(59, 130, 246, 0.5));
+    opacity: 1;
+  }
+}
+
+@keyframes quantumPacketTravel {
+  0% {
+    offset-distance: 0%;
+    opacity: 0.2;
+    transform: scale(0.6);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  90% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes holographicScanline {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0.15;
+  }
+}
+
+@keyframes targetLockReticle {
+  0% {
+    transform: rotate(0deg) scale(1.15);
+  }
+  50% {
+    transform: rotate(180deg) scale(0.95);
+  }
+  100% {
+    transform: rotate(360deg) scale(1.15);
+  }
+}
+
+/* Continuous Moving RGB Outline Radar Container (Strict 2px Outline Only) */
+.rgb-radar-housing {
+  position: relative;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+/* Continuous RGB Laser Border Runner strictly masked to the 2px ring */
+.rgb-radar-housing::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  padding: 2px; /* Strict 2px outline line */
+  background: conic-gradient(
+    from 0deg,
+    #ff0055 0deg,
+    #ff5500 45deg,
+    #ffcc00 90deg,
+    #10b981 135deg,
+    #06b6d4 180deg,
+    #3b82f6 225deg,
+    #8b5cf6 270deg,
+    #ec4899 315deg,
+    #ff0055 360deg
+  );
+  animation: rgbContinuousSpin 3.5s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Inner Radar Core Window (Colorless transparent glass inside) */
+.rgb-radar-inner {
+  position: relative;
+  z-index: 1;
+  border-radius: 9999px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--glass-card-bg);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+}
+
+/* Moving RGB Border Line for Cards & Badges */
+.rgb-moving-border {
+  position: relative;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.rgb-moving-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(
+    90deg,
+    #ff007f,
+    #ff7700,
+    #ffea00,
+    #00f0ff,
+    #00ff66,
+    #7928ca,
+    #ff007f
+  );
+  background-size: 300% 300%;
+  animation: rgbGradientWave 4s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Continuous Moving RGB Light Outline ONLY ("Do not show RGB in full cards only outline lines")
+   Strictly masks out the entire card interior so zero RGB exists inside the card.
+   ========================================================================== */
+.rgb-outline-line-runner {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px; /* STRICT 2px OUTLINE LINE ONLY */
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 20;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+.rgb-outline-spinner {
+  position: absolute;
+  top: -60%;
+  left: -60%;
+  width: 220%;
+  height: 220%;
+  background: conic-gradient(
+    from 0deg,
+    #ff0055 0deg,
+    #ff7700 45deg,
+    #ffea00 90deg,
+    #00ff66 135deg,
+    #00ffff 180deg,
+    #0066ff 225deg,
+    #aa00ff 270deg,
+    #ec4899 315deg,
+    #ff0055 360deg
+  );
+  animation: rgbContinuousSpin 3.5s linear infinite;
+  filter: saturate(240%);
+}
+
 
