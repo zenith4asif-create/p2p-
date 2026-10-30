@@ -5,7 +5,8 @@ import {
   QrCode, 
   Clock, 
   LayoutDashboard, 
-  User as UserIcon
+  User as UserIcon,
+  Users
 } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext.tsx';
 import { ToastProvider } from './context/ToastContext.tsx';
@@ -16,6 +17,7 @@ import { LandingView } from './views/LandingView.tsx';
 import { CreateShareView } from './views/CreateShareView.tsx';
 import { ActiveShareView } from './views/ActiveShareView.tsx';
 import { ReceiveView } from './views/ReceiveView.tsx';
+import { CommunityView } from './views/CommunityView.tsx';
 import { DashboardView } from './views/DashboardView.tsx';
 import { HistoryView } from './views/HistoryView.tsx';
 import { ProfileView } from './views/ProfileView.tsx';
@@ -97,20 +99,20 @@ const MobileBottomNavBar: React.FC<{
         <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 tracking-tight mt-1 whitespace-nowrap">Scan QR</span>
       </button>
 
-      {/* 4. Transfer History */}
+      {/* 4. Community Stream */}
       <button
         type="button"
-        onClick={() => handleNavClick(() => onNavigate('history'))}
+        onClick={() => handleNavClick(() => onNavigate('community'))}
         className={`min-h-[48px] min-w-[56px] flex flex-col items-center justify-center rounded-xl px-2 py-1 transition-all active:scale-95 ${
-          currentView === 'history'
+          currentView === 'community'
             ? 'text-emerald-600 dark:text-emerald-400 font-bold'
             : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
         }`}
       >
-        <div className={`p-1 rounded-xl transition-all ${currentView === 'history' ? 'bg-emerald-500/20 shadow-sm scale-105' : ''}`}>
-          <Clock className="w-5 h-5" />
+        <div className={`p-1 rounded-xl transition-all ${currentView === 'community' ? 'bg-emerald-500/20 shadow-sm scale-105' : ''}`}>
+          <Users className="w-5 h-5" />
         </div>
-        <span className="text-[10px] tracking-tight mt-0.5 whitespace-nowrap font-medium">History</span>
+        <span className="text-[10px] tracking-tight mt-0.5 whitespace-nowrap font-medium">Community</span>
       </button>
 
       {/* 5. User Account / Dashboard */}
@@ -189,6 +191,8 @@ function AppContent() {
         setCurrentView('receive');
       } else if (hash === 'create' || hash === 'send') {
         setCurrentView('create');
+      } else if (hash === 'community') {
+        setCurrentView('community');
       } else if (hash === 'dashboard') {
         setCurrentView('dashboard');
       } else if (hash === 'history') {
@@ -315,6 +319,13 @@ function AppContent() {
             initialCode={receiveCode}
             onNavigate={navigateTo}
             onOpenScanner={() => setIsScannerOpen(true)}
+          />
+        )}
+
+        {currentView === 'community' && (
+          <CommunityView
+            onOpenAuth={() => setIsAuthOpen(true)}
+            onNavigate={navigateTo}
           />
         )}
 

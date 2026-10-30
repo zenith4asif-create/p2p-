@@ -27,6 +27,7 @@ import { SciFiRadar } from '../components/SciFiRadar.tsx';
 import { SciFiSharingHolostream } from '../components/SciFiSharingHolostream.tsx';
 import { SciFiConnectedCelebration } from '../components/SciFiConnectedCelebration.tsx';
 import { RGBLightBox } from '../components/RGBLightBox.tsx';
+import { QuantumProgressBar } from '../components/QuantumProgressBar.tsx';
 import { triggerHaptic, playSciFiSound } from '../utils/haptics.ts';
 
 interface ActiveShareViewProps {
@@ -549,32 +550,14 @@ export const ActiveShareView: React.FC<ActiveShareViewProps> = ({
               </div>
             </div>
 
-            {/* Live Transfer Metrics */}
+            {/* Visual Progress Bar with Animated Quantum Packet Effect */}
             {transferProgress && (
-              <div className="space-y-3 liquid-glass-input p-4 rounded-2xl">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-slate-900 dark:text-white truncate max-w-[200px]">
-                    {transferProgress.fileName}
-                  </span>
-                  <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                    {transferProgress.percent}%
-                  </span>
-                </div>
-
-                <div className="w-full bg-black/10 dark:bg-white/10 h-2.5 rounded-full overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 h-full transition-all duration-150"
-                    style={{ width: `${transferProgress.percent}%` }}
-                  />
-                </div>
-
-                <div className="flex flex-wrap items-center justify-between gap-1 text-[11px] font-mono text-slate-600 dark:text-neutral-300">
-                  <span>
-                    {formatBytes(transferProgress.bytesTransferred)} / {formatBytes(transferProgress.totalBytes)}
-                  </span>
-                  <span>Speed: {formatSpeed(transferProgress.speedBytesPerSec)}</span>
-                  <span>ETA: {transferProgress.etaSeconds}s</span>
-                </div>
+              <div className="my-4">
+                <QuantumProgressBar 
+                  progress={transferProgress} 
+                  mode="upload" 
+                  title="Quantum P2P Upload Stream" 
+                />
               </div>
             )}
 

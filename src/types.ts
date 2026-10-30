@@ -53,7 +53,61 @@ export interface UserProfile {
   uid: string;
   name: string;
   email: string;
+  bio?: string;
+  avatarUrl?: string;
+  handle?: string;
   createdAt: number;
+}
+
+export interface CommunityPost {
+  id: string;
+  authorUid: string;
+  authorName: string;
+  authorAvatar?: string;
+  authorHandle?: string;
+  content: string;
+  mediaUrl?: string;
+  mediaType?: 'image' | 'video' | 'file';
+  mediaName?: string;
+  mediaSize?: number;
+  likesCount: number;
+  commentsCount: number;
+  createdAt: number;
+}
+
+export interface CommunityComment {
+  id: string;
+  postId: string;
+  authorUid: string;
+  authorName: string;
+  authorAvatar?: string;
+  text: string;
+  createdAt: number;
+}
+
+export interface DirectMessage {
+  id: string;
+  conversationId: string;
+  senderUid: string;
+  senderName: string;
+  receiverUid: string;
+  receiverName: string;
+  text: string;
+  mediaUrl?: string;
+  mediaType?: 'image' | 'video' | 'file';
+  mediaName?: string;
+  createdAt: number;
+  read: boolean;
+}
+
+export interface ConversationSummary {
+  conversationId: string;
+  otherUid: string;
+  otherName: string;
+  otherAvatar?: string;
+  lastMessage: string;
+  lastTimestamp: number;
+  unreadCount?: number;
 }
 
 export interface HistoryItem {
@@ -76,3 +130,4 @@ export interface AppSettings {
   soundAlerts: boolean;
   retentionHours: number;
 }
+

@@ -10,7 +10,8 @@ import {
   Settings, 
   LayoutDashboard,
   Sun,
-  Moon
+  Moon,
+  Users
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useTheme } from '../context/ThemeContext.tsx';
@@ -88,6 +89,19 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Download className="w-3.5 h-3.5" />
             <span>Receive</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onNavigate('community')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+              currentView === 'community'
+                ? 'liquid-glass-accent text-white font-bold shadow-md'
+                : 'text-slate-700 dark:text-neutral-300 hover:text-slate-950 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
+            }`}
+          >
+            <Users className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+            <span>Community</span>
           </button>
 
           <button

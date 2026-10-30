@@ -35,6 +35,64 @@ export interface WebRTCEvents {
   onError?: (error: Error) => void;
 }
 
+export function resolveMimeType(mimeType: string, fileName: string): string {
+  const cleanMime = (mimeType || '').trim().toLowerCase();
+  const lowerName = fileName.toLowerCase();
+
+  // If MIME is specifically quicktime or m4v, convert to video/mp4 for universal cross-browser HTML5 playback
+  if (cleanMime === 'video/quicktime' || cleanMime === 'video/x-m4v') {
+    return 'video/mp4';
+  }
+
+  // If valid media mime type already present, use it
+  if (cleanMime && cleanMime !== 'application/octet-stream' && cleanMime !== 'binary/octet-stream') {
+    return cleanMime;
+  }
+
+  // Infer from file extension
+  const ext = lowerName.split('.').pop() || '';
+  switch (ext) {
+    case 'mp4':
+    case 'm4v':
+    case 'mov':
+      return 'video/mp4';
+    case 'webm':
+      return 'video/webm';
+    case 'ogv':
+    case 'ogg':
+      return 'video/ogg';
+    case 'mkv':
+    case 'avi':
+    case 'wmv':
+    case '3gp':
+      return 'video/mp4';
+    case 'jpg':
+    case 'jpeg':
+      return 'image/jpeg';
+    case 'png':
+      return 'image/png';
+    case 'gif':
+      return 'image/gif';
+    case 'webp':
+      return 'image/webp';
+    case 'svg':
+      return 'image/svg+xml';
+    case 'mp3':
+      return 'audio/mpeg';
+    case 'wav':
+      return 'audio/wav';
+    case 'm4a':
+    case 'aac':
+      return 'audio/aac';
+    case 'pdf':
+      return 'application/pdf';
+    case 'zip':
+      return 'application/zip';
+    default:
+      return cleanMime || 'application/octet-stream';
+  }
+}
+
 /**
  * Sender WebRTC peer instance
  */
@@ -183,31 +241,48 @@ export class SenderPeer {
       if (this.isDestroyed) break;
       const file = files[i];
       const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+      const resolvedMime = resolveMimeType(file.type, file.name);
 
-      // Send File Start metadata
+      // Send File Start metadata with precise resolved mimeType
       this.dataChannel.send(JSON.stringify({
         type: 'FILE_START',
         fileId: `file_${i}_${file.name}`,
         name: file.name,
         size: file.size,
-        mimeType: file.type || 'application/octet-stream',
+        mimeType: resolvedMime,
         totalChunks
       }));
 
       let offset = 0;
       let chunkIndex = 0;
       let lastReportTime = performance.now();
-      let lastReportBytes = cumulativeBytesTransferred;
 
       while (offset < file.size && !this.isDestroyed) {
-        // Backpressure control: wait if buffer exceeds high watermark
+        // Backpressure control: wait if buffer exceeds high watermark with timeout fallback
         if (this.dataChannel.bufferedAmount > BUFFER_HIGH_WATERMARK) {
           await new Promise<void>((resolve) => {
+            let resolved = false;
+            const timer = setTimeout(() => {
+              if (!resolved) {
+                resolved = true;
+                this.dataChannel?.removeEventListener('bufferedamountlow', onLow);
+                resolve();
+              }
+            }, 60);
+
             const onLow = () => {
-              this.dataChannel?.removeEventListener('bufferedamountlow', onLow);
-              resolve();
+              if (!resolved) {
+                resolved = true;
+                clearTimeout(timer);
+                this.dataChannel?.removeEventListener('bufferedamountlow', onLow);
+                resolve();
+              }
             };
             this.dataChannel?.addEventListener('bufferedamountlow', onLow);
+
+            if (this.dataChannel && this.dataChannel.bufferedAmount <= BUFFER_LOW_WATERMARK) {
+              onLow();
+            }
           });
         }
 
@@ -219,9 +294,9 @@ export class SenderPeer {
         cumulativeBytesTransferred += buffer.byteLength;
         chunkIndex++;
 
-        // Report progress every 100ms or on completion
+        // Report progress every 80ms or on file completion
         const now = performance.now();
-        if (now - lastReportTime > 100 || offset >= file.size) {
+        if (now - lastReportTime > 80 || offset >= file.size) {
           const elapsedSec = (now - overallStartTime) / 1000;
           const currentSpeed = elapsedSec > 0 ? cumulativeBytesTransferred / elapsedSec : 0;
           const remainingBytes = Math.max(0, totalBytesAll - cumulativeBytesTransferred);
@@ -241,18 +316,24 @@ export class SenderPeer {
           });
 
           lastReportTime = now;
-          lastReportBytes = cumulativeBytesTransferred;
         }
       }
 
-      // Send File End signal
+      // Ensure all queued binary chunks are drained out of the network stack before sending FILE_END
+      while (this.dataChannel && this.dataChannel.bufferedAmount > 0 && !this.isDestroyed) {
+        await new Promise((r) => setTimeout(r, 20));
+      }
+
+      // Send File End signal with verified sizes
       this.dataChannel.send(JSON.stringify({
         type: 'FILE_END',
-        fileId: `file_${i}_${file.name}`
+        fileId: `file_${i}_${file.name}`,
+        size: file.size,
+        mimeType: resolvedMime
       }));
 
-      // Short delay between files for receiver GC stability
-      await new Promise((r) => setTimeout(r, 100));
+      // Short pacing delay between files for receiver GC stability
+      await new Promise((r) => setTimeout(r, 80));
     }
 
     this.updateState('completed', 'All files transferred successfully');
@@ -427,11 +508,12 @@ export class ReceiverPeer {
       try {
         const msg = JSON.parse(data);
         if (msg.type === 'FILE_START') {
+          const resolvedMime = resolveMimeType(msg.mimeType, msg.name);
           this.currentFileMeta = {
             fileId: msg.fileId,
             name: msg.name,
             size: msg.size,
-            mimeType: msg.mimeType,
+            mimeType: resolvedMime,
             totalChunks: msg.totalChunks,
           };
           this.receivedChunks = [];
@@ -441,16 +523,17 @@ export class ReceiverPeer {
           }
           this.updateState('transferring', `Receiving ${msg.name}...`);
         } else if (msg.type === 'FILE_END') {
-          // File completed, assemble Blob
+          // File completed, assemble Blob with verified MIME type
           if (this.currentFileMeta) {
-            const blob = new Blob(this.receivedChunks, { type: this.currentFileMeta.mimeType });
+            const finalMime = resolveMimeType(msg.mimeType || this.currentFileMeta.mimeType, this.currentFileMeta.name);
+            const blob = new Blob(this.receivedChunks, { type: finalMime });
             const objectUrl = URL.createObjectURL(blob);
 
             this.events.onFileReceived?.({
               id: this.currentFileMeta.fileId,
               name: this.currentFileMeta.name,
-              size: this.currentFileMeta.size,
-              mimeType: this.currentFileMeta.mimeType,
+              size: this.currentBytesReceived || this.currentFileMeta.size,
+              mimeType: finalMime,
               blob,
               url: objectUrl
             });

@@ -437,6 +437,25 @@ html.light .subtext-contrast {
   }
 }
 
+@keyframes quantumTrackPacketTravel {
+  0% {
+    transform: translateX(-150%) scaleX(0.5);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+    transform: translateX(-50%) scaleX(1);
+  }
+  85% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateX(950%) scaleX(0.5);
+    opacity: 0;
+  }
+}
+
+
 @keyframes holographicScanline {
   0% {
     transform: translateY(-100%);

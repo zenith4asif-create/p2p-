@@ -6,7 +6,8 @@ import {
   Zap, 
   Clock, 
   ShieldCheck, 
-  ArrowRight
+  ArrowRight,
+  Users
 } from 'lucide-react';
 import { GhibliDancingDuo } from '../components/GhibliArt.tsx';
 import { RGBLightBox } from '../components/RGBLightBox.tsx';
@@ -127,6 +128,31 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigate, onOpenScan
               </button>
             </form>
           </RGBLightBox>
+        </div>
+
+        {/* Community Stream Callout Banner */}
+        <div className="max-w-md mx-auto mt-4 w-full px-2">
+          <button
+            type="button"
+            onClick={() => handleAction(() => onNavigate('community'))}
+            className="w-full p-3.5 rounded-2xl liquid-glass-card hover:border-emerald-500/40 flex items-center justify-between gap-3 text-left transition group active:scale-[0.99] shadow-sm"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-xl liquid-glass-button text-emerald-500 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Users className="w-4 h-4" />
+              </div>
+              <div className="truncate">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-xs text-slate-900 dark:text-white">Community Stream</span>
+                  <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold">New</span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-neutral-400 truncate">
+                  Post 4K videos, photos, follow creators &amp; private chat
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="w-3.5 h-3.5 text-emerald-500 group-hover:translate-x-1 transition-transform shrink-0" />
+          </button>
         </div>
 
       </section>

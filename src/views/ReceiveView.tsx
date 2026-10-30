@@ -13,7 +13,10 @@ import {
   ArrowRight, 
   Loader2,
   FileCheck2,
-  AlertCircle
+  AlertCircle,
+  Play,
+  Eye,
+  X
 } from 'lucide-react';
 import { ShareSession, TransferProgress, FileMetadata } from '../types.ts';
 import { formatBytes, formatSpeed, formatTimeLeft, getFileCategory, isShareExpired, saveToHistory } from '../utils/helpers.ts';
@@ -25,6 +28,7 @@ import { SciFiRadar } from '../components/SciFiRadar.tsx';
 import { SciFiSharingHolostream } from '../components/SciFiSharingHolostream.tsx';
 import { SciFiConnectedCelebration } from '../components/SciFiConnectedCelebration.tsx';
 import { RGBLightBox } from '../components/RGBLightBox.tsx';
+import { QuantumProgressBar } from '../components/QuantumProgressBar.tsx';
 import { triggerHaptic, playSciFiSound } from '../utils/haptics.ts';
 
 interface ReceiveViewProps {
@@ -56,6 +60,7 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
   const [receivedFiles, setReceivedFiles] = useState<Record<string, { blob: Blob; url: string }>>({});
   const [showFullScreenSuccess, setShowFullScreenSuccess] = useState<boolean>(false);
   const [showConnectedCelebration, setShowConnectedCelebration] = useState<boolean>(false);
+  const [activeMediaPreview, setActiveMediaPreview] = useState<{ url: string; name: string; type: 'video' | 'image' | 'other' } | null>(null);
   const receiverPeerRef = useRef<ReceiverPeer | null>(null);
 
   // Auto-search if initialCode is provided
@@ -494,6 +499,17 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
                     </div>
                   </div>
 
+                  {/* Visual Progress Bar with Animated Quantum Packet Effect */}
+                  {transferProgress && (
+                    <div className="my-2">
+                      <QuantumProgressBar
+                        progress={transferProgress}
+                        mode="receiver"
+                        title="Quantum Reception Stream"
+                      />
+                    </div>
+                  )}
+
                   {/* Modern Sci-Fi Holographic Data Conduit */}
                   <SciFiSharingHolostream
                     progress={transferProgress}
@@ -576,16 +592,64 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
                   </div>
                 </div>
 
-                <div className="shrink-0">
-                  {share.mode === 'cloud' ? (
+                <div className="flex items-center gap-2 shrink-0">
+                  {/* P2P Video/Image Play & Preview */}
+                  {hasReceivedP2P && (getFileCategory(file.mimeType, file.name) === 'video' || getFileCategory(file.mimeType, file.name) === 'image') && (
                     <button
                       type="button"
-                      onClick={() => handleDownloadCloudFile(file)}
-                      className="min-h-[44px] flex items-center gap-1.5 px-3.5 py-2 rounded-xl liquid-glass-button text-slate-800 dark:text-neutral-200 text-xs font-semibold hover:text-slate-950 dark:hover:text-white shadow-sm"
+                      onClick={() => {
+                        triggerHaptic('selection');
+                        setActiveMediaPreview({
+                          url: hasReceivedP2P.url,
+                          name: file.name,
+                          type: getFileCategory(file.mimeType, file.name) === 'video' ? 'video' : 'image',
+                        });
+                      }}
+                      className="min-h-[44px] flex items-center gap-1.5 px-3 py-2 rounded-xl liquid-glass-button text-purple-600 dark:text-purple-300 text-xs font-bold hover:bg-purple-500/15 transition shadow-sm"
                     >
-                      <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                      <span>Download</span>
+                      {getFileCategory(file.mimeType, file.name) === 'video' ? (
+                        <>
+                          <Play className="w-3.5 h-3.5 fill-current" />
+                          <span>Play Video</span>
+                        </>
+                      ) : (
+                        <>
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Preview</span>
+                        </>
+                      )}
                     </button>
+                  )}
+
+                  {/* Cloud Mode Stream or Download */}
+                  {share.mode === 'cloud' ? (
+                    <div className="flex items-center gap-1.5">
+                      {file.secureUrl && (getFileCategory(file.mimeType, file.name) === 'video' || getFileCategory(file.mimeType, file.name) === 'image') && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            triggerHaptic('selection');
+                            setActiveMediaPreview({
+                              url: file.secureUrl!,
+                              name: file.name,
+                              type: getFileCategory(file.mimeType, file.name) === 'video' ? 'video' : 'image',
+                            });
+                          }}
+                          className="min-h-[44px] flex items-center gap-1.5 px-3 py-2 rounded-xl liquid-glass-button text-purple-600 dark:text-purple-300 text-xs font-bold shadow-sm"
+                        >
+                          <Play className="w-3.5 h-3.5 fill-current" />
+                          <span>Play</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleDownloadCloudFile(file)}
+                        className="min-h-[44px] flex items-center gap-1.5 px-3.5 py-2 rounded-xl liquid-glass-button text-slate-800 dark:text-neutral-200 text-xs font-semibold hover:text-slate-950 dark:hover:text-white shadow-sm"
+                      >
+                        <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <span>Download</span>
+                      </button>
+                    </div>
                   ) : hasReceivedP2P ? (
                     <button
                       type="button"
@@ -593,7 +657,7 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
                       className="min-h-[44px] flex items-center gap-1.5 px-3.5 py-2 rounded-xl liquid-glass-accent text-white text-xs font-bold shadow-md"
                     >
                       <FileCheck2 className="w-3.5 h-3.5" />
-                      <span>Save Again</span>
+                      <span>Save File</span>
                     </button>
                   ) : (
                     <div className="flex items-center gap-1 text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
@@ -606,6 +670,78 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
           })}
         </div>
       </div>
+
+      {/* Interactive Video Playback & Media Lightbox Modal */}
+      {activeMediaPreview && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in"
+          onClick={() => setActiveMediaPreview(null)}
+        >
+          <div 
+            className="relative w-full max-w-3xl liquid-glass-card rounded-3xl p-4 sm:p-6 overflow-hidden shadow-2xl border border-white/20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-black/10 dark:border-white/10">
+              <div className="truncate pr-2">
+                <span className="text-[10px] font-mono font-bold tracking-widest uppercase text-emerald-600 dark:text-emerald-400 block">
+                  {activeMediaPreview.type === 'video' ? '4K Video Playback Stream' : 'High-Res Image Preview'}
+                </span>
+                <p className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                  {activeMediaPreview.name}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveMediaPreview(null)}
+                className="min-h-[40px] min-w-[40px] rounded-xl liquid-glass-button text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Media Content */}
+            <div className="relative rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[220px] max-h-[70vh]">
+              {activeMediaPreview.type === 'video' ? (
+                <video
+                  src={activeMediaPreview.url}
+                  controls
+                  autoPlay
+                  playsInline
+                  preload="auto"
+                  className="w-full max-h-[70vh] rounded-2xl object-contain"
+                >
+                  Your browser does not support video playback.
+                </video>
+              ) : (
+                <img
+                  src={activeMediaPreview.url}
+                  alt={activeMediaPreview.name}
+                  className="w-full max-h-[70vh] rounded-2xl object-contain"
+                />
+              )}
+            </div>
+
+            {/* Modal Footer Controls */}
+            <div className="flex items-center justify-between gap-3 mt-4 pt-3 border-t border-black/10 dark:border-white/10">
+              <span className="text-xs text-slate-500 dark:text-neutral-400 font-mono">
+                Decrypted ArrayBuffer Blob
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  triggerBrowserDownload(activeMediaPreview.url, activeMediaPreview.name);
+                  showToast(`Downloaded ${activeMediaPreview.name} ✓`, 'success');
+                }}
+                className="min-h-[44px] px-5 py-2 rounded-xl liquid-glass-accent text-white text-xs font-black flex items-center gap-2 shadow-md active:scale-95 transition"
+              >
+                <Download className="w-4 h-4 stroke-[2.5]" />
+                <span>Save to Device</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Full Screen Celebratory Success Modal */}
       <FullScreenSuccessModal
