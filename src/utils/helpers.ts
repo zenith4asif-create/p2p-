@@ -39,7 +39,8 @@ export function formatSpeed(bytesPerSec: number): string {
  */
 export function isShareExpired(expiresAt: number): boolean {
   if (!expiresAt) return true;
-  return Date.now() > expiresAt;
+  // 120-second grace tolerance accounts for clock differences between mobile and desktop/Windows devices
+  return Date.now() > expiresAt + 120000;
 }
 
 /**

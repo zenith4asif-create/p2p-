@@ -15,6 +15,9 @@ export interface FileMetadata {
   size: number;
   mimeType: string;
   lastModified?: number;
+  // Server relay streaming URL (supports Range HTTP 206 for videos & instant download)
+  relayUrl?: string;
+  isReady?: boolean;
   // Cloudinary specific fields if uploaded
   cloudinaryPublicId?: string;
   secureUrl?: string;

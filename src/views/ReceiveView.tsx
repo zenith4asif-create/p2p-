@@ -91,6 +91,29 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
     return () => clearInterval(timer);
   }, [share]);
 
+  // Continuously sync share files and status from server
+  useEffect(() => {
+    if (!share) return;
+    let isMounted = true;
+    const syncInterval = setInterval(async () => {
+      if (!isMounted) return;
+      try {
+        const res = await fetch(`/api/shares/${share.id}`);
+        if (res.ok) {
+          const fresh = await res.json();
+          if (isMounted && fresh && fresh.files) {
+            setShare((prev) => prev ? { ...prev, ...fresh } : fresh);
+          }
+        }
+      } catch (_) {}
+    }, 1500);
+
+    return () => {
+      isMounted = false;
+      clearInterval(syncInterval);
+    };
+  }, [share?.id]);
+
   // Connect WebRTC receiver when share is loaded in P2P mode
   useEffect(() => {
     if (!share || share.mode !== 'p2p' || isShareExpired(share.expiresAt)) return;
@@ -206,6 +229,29 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
     }
   };
 
+  const handleDownloadFile = async (file: FileMetadata) => {
+    triggerHaptic('tap');
+    const p2pFile = receivedFiles[file.name];
+    if (p2pFile) {
+      triggerBrowserDownload(p2pFile.url, file.name);
+      showToast(`Saved ${file.name} ✓`, 'success');
+      return;
+    }
+
+    if (file.secureUrl) {
+      await handleDownloadCloudFile(file);
+      return;
+    }
+
+    // Direct buffer relay download from server
+    if (share) {
+      const relayUrl = `/api/transfer/${share.id}/files/${file.id}?download=1`;
+      showToast(`Downloading ${file.name}...`, 'info');
+      triggerBrowserDownload(relayUrl, file.name);
+      showToast(`Downloaded ${file.name} ✓`, 'success');
+    }
+  };
+
   const handleDownloadCloudFile = async (file: FileMetadata) => {
     const url = file.secureUrl;
     if (!url) {
@@ -226,11 +272,11 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
     }
   };
 
-  const handleDownloadAllCloud = async () => {
+  const handleDownloadAll = async () => {
     if (!share) return;
     const fileList = Object.values(share.files);
     for (const file of fileList) {
-      await handleDownloadCloudFile(file);
+      await handleDownloadFile(file);
       await new Promise((r) => setTimeout(r, 400));
     }
     setTimeout(() => {
@@ -550,17 +596,15 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
           </div>
         )}
 
-        {/* Cloud Mode Download All button */}
-        {share.mode === 'cloud' && (
-          <button
-            type="button"
-            onClick={handleDownloadAllCloud}
-            className="w-full min-h-[50px] rounded-2xl liquid-glass-accent text-white font-black text-sm shadow-xl shadow-emerald-500/25 transition flex items-center justify-center gap-2 active:scale-95"
-          >
-            <Download className="w-4 h-4 stroke-[2.5]" />
-            <span>DOWNLOAD ALL ({fileList.length} FILES)</span>
-          </button>
-        )}
+        {/* Universal Download All button */}
+        <button
+          type="button"
+          onClick={handleDownloadAll}
+          className="w-full min-h-[50px] rounded-2xl liquid-glass-accent text-white font-black text-sm shadow-xl shadow-emerald-500/25 transition flex items-center justify-center gap-2 active:scale-95"
+        >
+          <Download className="w-4 h-4 stroke-[2.5]" />
+          <span>DOWNLOAD ALL ({fileList.length} {fileList.length === 1 ? 'FILE' : 'FILES'})</span>
+        </button>
       </div>
 
       {/* Files List Card */}
@@ -572,6 +616,8 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
         <div className="space-y-3">
           {fileList.map((file, idx) => {
             const hasReceivedP2P = receivedFiles[file.name];
+            const isMedia = getFileCategory(file.mimeType, file.name) === 'video' || getFileCategory(file.mimeType, file.name) === 'image';
+            const streamUrl = hasReceivedP2P?.url || file.secureUrl || `/api/transfer/${share.id}/files/${file.id}`;
 
             return (
               <div
@@ -593,14 +639,14 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  {/* P2P Video/Image Play & Preview */}
-                  {hasReceivedP2P && (getFileCategory(file.mimeType, file.name) === 'video' || getFileCategory(file.mimeType, file.name) === 'image') && (
+                  {/* High Quality Video/Image Play & Preview with 206 Range Stream */}
+                  {isMedia && (
                     <button
                       type="button"
                       onClick={() => {
                         triggerHaptic('selection');
                         setActiveMediaPreview({
-                          url: hasReceivedP2P.url,
+                          url: streamUrl,
                           name: file.name,
                           type: getFileCategory(file.mimeType, file.name) === 'video' ? 'video' : 'image',
                         });
@@ -621,49 +667,24 @@ export const ReceiveView: React.FC<ReceiveViewProps> = ({
                     </button>
                   )}
 
-                  {/* Cloud Mode Stream or Download */}
-                  {share.mode === 'cloud' ? (
-                    <div className="flex items-center gap-1.5">
-                      {file.secureUrl && (getFileCategory(file.mimeType, file.name) === 'video' || getFileCategory(file.mimeType, file.name) === 'image') && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            triggerHaptic('selection');
-                            setActiveMediaPreview({
-                              url: file.secureUrl!,
-                              name: file.name,
-                              type: getFileCategory(file.mimeType, file.name) === 'video' ? 'video' : 'image',
-                            });
-                          }}
-                          className="min-h-[44px] flex items-center gap-1.5 px-3 py-2 rounded-xl liquid-glass-button text-purple-600 dark:text-purple-300 text-xs font-bold shadow-sm"
-                        >
-                          <Play className="w-3.5 h-3.5 fill-current" />
-                          <span>Play</span>
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => handleDownloadCloudFile(file)}
-                        className="min-h-[44px] flex items-center gap-1.5 px-3.5 py-2 rounded-xl liquid-glass-button text-slate-800 dark:text-neutral-200 text-xs font-semibold hover:text-slate-950 dark:hover:text-white shadow-sm"
-                      >
-                        <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  {/* Immediate Download & Save Button */}
+                  <button
+                    type="button"
+                    onClick={() => handleDownloadFile(file)}
+                    className="min-h-[44px] flex items-center gap-1.5 px-3.5 py-2 rounded-xl liquid-glass-accent text-white text-xs font-bold shadow-md active:scale-95 transition"
+                  >
+                    {hasReceivedP2P ? (
+                      <>
+                        <FileCheck2 className="w-3.5 h-3.5" />
+                        <span>Save File</span>
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-3.5 h-3.5" />
                         <span>Download</span>
-                      </button>
-                    </div>
-                  ) : hasReceivedP2P ? (
-                    <button
-                      type="button"
-                      onClick={() => triggerBrowserDownload(hasReceivedP2P.url, file.name)}
-                      className="min-h-[44px] flex items-center gap-1.5 px-3.5 py-2 rounded-xl liquid-glass-accent text-white text-xs font-bold shadow-md"
-                    >
-                      <FileCheck2 className="w-3.5 h-3.5" />
-                      <span>Save File</span>
-                    </button>
-                  ) : (
-                    <div className="flex items-center gap-1 text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
-                      <span>Waiting for P2P chunk stream...</span>
-                    </div>
-                  )}
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             );

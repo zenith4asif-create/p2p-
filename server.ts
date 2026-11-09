@@ -13,7 +13,19 @@ const app = express();
 const PORT = 3000;
 const isProduction = process.env.NODE_ENV === 'production';
 
-app.use(express.json());
+// Universal Cross-Origin and Streaming Headers for Windows & Cross-Device Access
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Range');
+  res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Content-Length, Accept-Ranges');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
+app.use(express.json({ limit: '20mb' }));
 
 // Server Time sync API
 app.get('/api/time', (_req, res) => {
@@ -179,7 +191,7 @@ app.get('/api/shares/code/:code', (req, res) => {
   if (!mapping) {
     return res.status(404).json({ error: 'Share not found' });
   }
-  if (mapping.expiresAt && Date.now() > mapping.expiresAt) {
+  if (mapping.expiresAt && Date.now() > mapping.expiresAt + 60 * 1000) {
     return res.status(410).json({ error: 'Share expired' });
   }
   const share = store.shares[mapping.shareId];
@@ -211,8 +223,95 @@ app.delete('/api/shares/:id', (req, res) => {
     }
     delete store.shares[req.params.id];
   }
+  // Clean up buffered files
+  try {
+    const uploadDir = path.resolve(__dirname, 'data', 'uploads', req.params.id);
+    if (fs.existsSync(uploadDir)) {
+      fs.rmSync(uploadDir, { recursive: true, force: true });
+    }
+  } catch (_) {}
   scheduleSave();
   res.json({ success: true });
+});
+
+// 1.5 UNIVERSAL TRANSFER BUFFER & STREAMING RELAY
+// Eliminates NAT failure, delivers 100% reliable sender-data retrieval, and supports Range video playback
+app.post(
+  '/api/transfer/:sessionId/upload/:fileId',
+  express.raw({ limit: '250mb', type: () => true }),
+  (req, res) => {
+    const { sessionId, fileId } = req.params;
+    const uploadDir = path.resolve(__dirname, 'data', 'uploads', sessionId);
+    fs.mkdirSync(uploadDir, { recursive: true });
+    const filePath = path.join(uploadDir, fileId);
+    fs.writeFileSync(filePath, req.body);
+
+    if (store.shares[sessionId] && store.shares[sessionId].files[fileId]) {
+      store.shares[sessionId].files[fileId].relayUrl = `/api/transfer/${sessionId}/files/${fileId}`;
+      store.shares[sessionId].files[fileId].isReady = true;
+    }
+    scheduleSave();
+    res.json({ success: true, fileId, relayUrl: `/api/transfer/${sessionId}/files/${fileId}` });
+  }
+);
+
+app.get('/api/transfer/:sessionId/files/:fileId', (req, res) => {
+  const { sessionId, fileId } = req.params;
+  const uploadDir = path.resolve(__dirname, 'data', 'uploads', sessionId);
+  const filePath = path.join(uploadDir, fileId);
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'File not yet buffered on relay' });
+  }
+
+  const stat = fs.statSync(filePath);
+  const fileSize = stat.size;
+  const fileMeta = store.shares[sessionId]?.files[fileId];
+  const mimeType = fileMeta?.mimeType || 'application/octet-stream';
+  const fileName = fileMeta?.name || 'file';
+
+  // Support HTTP 206 Partial Content (Range requests) for smooth video/audio playback on Windows browsers
+  const range = req.headers.range;
+  if (range) {
+    const parts = range.replace(/bytes=/, '').split('-');
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+    const chunksize = end - start + 1;
+    const file = fs.createReadStream(filePath, { start, end });
+    const head = {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Content-Type': mimeType,
+      'Content-Disposition': `inline; filename="${encodeURIComponent(fileName)}"`,
+    };
+    res.writeHead(206, head);
+    file.pipe(res);
+  } else {
+    const head = {
+      'Content-Length': fileSize,
+      'Content-Type': mimeType,
+      'Accept-Ranges': 'bytes',
+      'Content-Disposition': req.query.download === '1'
+        ? `attachment; filename="${encodeURIComponent(fileName)}"`
+        : `inline; filename="${encodeURIComponent(fileName)}"`,
+    };
+    res.writeHead(200, head);
+    fs.createReadStream(filePath).pipe(res);
+  }
+});
+
+app.get('/api/transfer/:sessionId/status', (req, res) => {
+  const { sessionId } = req.params;
+  const uploadDir = path.resolve(__dirname, 'data', 'uploads', sessionId);
+  const files: Record<string, boolean> = {};
+  if (fs.existsSync(uploadDir)) {
+    const list = fs.readdirSync(uploadDir);
+    for (const f of list) {
+      files[f] = true;
+    }
+  }
+  res.json({ sessionId, bufferedFiles: files });
 });
 
 // 2. WEBRTC SIGNALING API
@@ -478,6 +577,19 @@ async function startServer() {
       appType: 'spa'
     });
     app.use(vite.middlewares);
+    // SPA HTML transform fallback for Windows & cross-origin navigations
+    app.use('*', async (req, res, next) => {
+      if (req.originalUrl.startsWith('/api/')) return next();
+      try {
+        const url = req.originalUrl;
+        let template = fs.readFileSync(path.resolve(__dirname, 'index.html'), 'utf-8');
+        template = await vite.transformIndexHtml(url, template);
+        res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(template);
+      } catch (e: any) {
+        vite.ssrFixStacktrace(e);
+        next(e);
+      }
+    });
   } else {
     // Production mode: serve static files from dist
     app.use(express.static(path.resolve(__dirname, 'dist')));

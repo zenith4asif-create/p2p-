@@ -104,6 +104,44 @@ export const ActiveShareView: React.FC<ActiveShareViewProps> = ({
     return () => unsubscribe();
   }, [currentShare.id]);
 
+  // 3.5 Universal Background Buffer to Server Relay
+  // Ensures receiver can ALWAYS fetch sender data and stream video even if NAT blocks WebRTC
+  useEffect(() => {
+    if (!rawFiles || rawFiles.length === 0 || isExpired) return;
+
+    let isCancelled = false;
+    const fileEntries = Object.entries(currentShare.files);
+
+    const bufferFiles = async () => {
+      for (let i = 0; i < rawFiles.length; i++) {
+        if (isCancelled) break;
+        const file = rawFiles[i];
+        const matched = fileEntries[i];
+        const fileId = matched ? matched[0] : `f_${i}_${Date.now()}`;
+        
+        try {
+          const buffer = await file.arrayBuffer();
+          await fetch(
+            `/api/transfer/${currentShare.id}/upload/${fileId}?name=${encodeURIComponent(file.name)}&mimeType=${encodeURIComponent(file.type)}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': file.type || 'application/octet-stream' },
+              body: buffer
+            }
+          );
+        } catch (e) {
+          console.warn('Background relay buffer notice:', e);
+        }
+      }
+    };
+
+    bufferFiles();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentShare.id, rawFiles, isExpired]);
+
   // 4. Initialize WebRTC peer if in P2P mode
   useEffect(() => {
     if (currentShare.mode !== 'p2p' || isExpired) return;

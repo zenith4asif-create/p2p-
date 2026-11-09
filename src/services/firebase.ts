@@ -163,7 +163,7 @@ export async function getShareByCode(code: string): Promise<ShareSession | null>
     const res = await fetch(`/api/shares/code/${formattedCode}`);
     if (res.ok) {
       const data = await res.json();
-      if (data && data.expiresAt && Date.now() <= data.expiresAt) {
+      if (data && data.id && data.code) {
         return data as ShareSession;
       }
     }
