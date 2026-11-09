@@ -134,8 +134,19 @@ export class SenderPeer {
       // Collect ICE candidates and push to signaling
       this.peerConnection.onicecandidate = (event) => {
         if (event.candidate && !this.isDestroyed) {
-          const candRef = push(ref(db, `signaling/${this.sessionId}/senderCandidates`));
-          set(candRef, event.candidate.toJSON());
+          const candidateJson = event.candidate.toJSON();
+          // 1. Post to authoritative server signaling API
+          fetch(`/api/signaling/${this.sessionId}/candidate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ candidate: candidateJson, role: 'sender' })
+          }).catch(() => {});
+
+          // 2. Dual-write to RTDB (catching any permission denied)
+          try {
+            const candRef = push(ref(db, `signaling/${this.sessionId}/senderCandidates`));
+            set(candRef, candidateJson).catch(() => {});
+          } catch (_) {}
         }
       };
 
@@ -143,14 +154,60 @@ export class SenderPeer {
       const offer = await this.peerConnection.createOffer();
       await this.peerConnection.setLocalDescription(offer);
 
-      // Save Offer in RTDB
-      await set(ref(db, `signaling/${this.sessionId}/offer`), {
+      const offerData = {
         type: offer.type,
         sdp: offer.sdp,
         createdAt: Date.now(),
-      });
+      };
 
-      // Listen for receiver Answer
+      // 1. Save Offer in server signaling API
+      fetch(`/api/signaling/${this.sessionId}/offer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(offerData)
+      }).catch(() => {});
+
+      // 2. Dual-save in RTDB (catching error)
+      try {
+        set(ref(db, `signaling/${this.sessionId}/offer`), offerData).catch(() => {});
+      } catch (_) {}
+
+      // Track processed receiver candidates to avoid duplicates
+      const processedCandidates = new Set<string>();
+
+      // Polling server signaling API every 600ms for answer and receiver candidates
+      const pollTimer = setInterval(async () => {
+        if (this.isDestroyed || !this.peerConnection) return;
+        try {
+          const res = await fetch(`/api/signaling/${this.sessionId}`);
+          if (!res.ok) return;
+          const sig = await res.json();
+
+          // Apply Answer
+          if (sig.answer && !this.peerConnection.currentRemoteDescription) {
+            this.updateState('connecting', 'Receiver joined! Negotiating connection');
+            await this.peerConnection.setRemoteDescription(
+              new RTCSessionDescription({ type: sig.answer.type, sdp: sig.answer.sdp })
+            );
+          }
+
+          // Apply Receiver ICE candidates
+          if (sig.receiverCandidates && Array.isArray(sig.receiverCandidates)) {
+            for (const cand of sig.receiverCandidates) {
+              const key = JSON.stringify(cand);
+              if (!processedCandidates.has(key)) {
+                processedCandidates.add(key);
+                try {
+                  await this.peerConnection.addIceCandidate(new RTCIceCandidate(cand));
+                } catch (_) {}
+              }
+            }
+          }
+        } catch (_) {}
+      }, 600);
+      this.signalingListeners.push(() => clearInterval(pollTimer));
+
+      // Dual listen for receiver Answer via RTDB with silent error fallback
       const answerRef = ref(db, `signaling/${this.sessionId}/answer`);
       const answerListener = onValue(answerRef, async (snap) => {
         if (snap.exists() && this.peerConnection && !this.peerConnection.currentRemoteDescription) {
@@ -160,28 +217,32 @@ export class SenderPeer {
             await this.peerConnection.setRemoteDescription(
               new RTCSessionDescription({ type: answerData.type, sdp: answerData.sdp })
             );
-          } catch (err) {
-            console.error('Failed setting remote description on sender:', err);
-          }
+          } catch (_) {}
         }
+      }, () => {});
+      this.signalingListeners.push(() => {
+        try { off(answerRef, 'value', answerListener); } catch (_) {}
       });
-      this.signalingListeners.push(() => off(answerRef, 'value', answerListener));
 
-      // Listen for receiver ICE candidates
+      // Dual listen for receiver ICE candidates via RTDB
       const recCandRef = ref(db, `signaling/${this.sessionId}/receiverCandidates`);
       const recCandListener = onValue(recCandRef, (snap) => {
         if (snap.exists() && this.peerConnection) {
           const candidates = snap.val();
           Object.values(candidates).forEach((cand: any) => {
-            try {
-              this.peerConnection?.addIceCandidate(new RTCIceCandidate(cand));
-            } catch (e) {
-              console.warn('ICE candidate addition issue:', e);
+            const key = JSON.stringify(cand);
+            if (!processedCandidates.has(key)) {
+              processedCandidates.add(key);
+              try {
+                this.peerConnection?.addIceCandidate(new RTCIceCandidate(cand));
+              } catch (_) {}
             }
           });
         }
+      }, () => {});
+      this.signalingListeners.push(() => {
+        try { off(recCandRef, 'value', recCandListener); } catch (_) {}
       });
-      this.signalingListeners.push(() => off(recCandRef, 'value', recCandListener));
 
     } catch (err) {
       this.updateState('failed', (err as Error).message);
@@ -411,12 +472,79 @@ export class ReceiverPeer {
       // Collect ICE candidates and push to signaling
       this.peerConnection.onicecandidate = (event) => {
         if (event.candidate && !this.isDestroyed) {
-          const candRef = push(ref(db, `signaling/${this.sessionId}/receiverCandidates`));
-          set(candRef, event.candidate.toJSON());
+          const candidateJson = event.candidate.toJSON();
+          // 1. Post to authoritative server signaling API
+          fetch(`/api/signaling/${this.sessionId}/candidate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ candidate: candidateJson, role: 'receiver' })
+          }).catch(() => {});
+
+          // 2. Dual-write to RTDB (catching error)
+          try {
+            const candRef = push(ref(db, `signaling/${this.sessionId}/receiverCandidates`));
+            set(candRef, candidateJson).catch(() => {});
+          } catch (_) {}
         }
       };
 
-      // Listen for Offer in RTDB
+      // Track processed sender candidates
+      const processedSenderCandidates = new Set<string>();
+
+      // Polling server signaling API every 600ms for Offer and Sender Candidates
+      const pollTimer = setInterval(async () => {
+        if (this.isDestroyed || !this.peerConnection) return;
+        try {
+          const res = await fetch(`/api/signaling/${this.sessionId}`);
+          if (!res.ok) return;
+          const sig = await res.json();
+
+          // Process Offer if not yet negotiated
+          if (sig.offer && !this.peerConnection.currentRemoteDescription) {
+            await this.peerConnection.setRemoteDescription(
+              new RTCSessionDescription({ type: sig.offer.type, sdp: sig.offer.sdp })
+            );
+
+            // Create and submit Answer
+            const answer = await this.peerConnection.createAnswer();
+            await this.peerConnection.setLocalDescription(answer);
+
+            const answerData = {
+              type: answer.type,
+              sdp: answer.sdp,
+              createdAt: Date.now()
+            };
+
+            // Post answer to server API
+            fetch(`/api/signaling/${this.sessionId}/answer`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(answerData)
+            }).catch(() => {});
+
+            // Dual write to RTDB
+            try {
+              set(ref(db, `signaling/${this.sessionId}/answer`), answerData).catch(() => {});
+            } catch (_) {}
+          }
+
+          // Apply Sender ICE candidates
+          if (sig.senderCandidates && Array.isArray(sig.senderCandidates)) {
+            for (const cand of sig.senderCandidates) {
+              const key = JSON.stringify(cand);
+              if (!processedSenderCandidates.has(key)) {
+                processedSenderCandidates.add(key);
+                try {
+                  await this.peerConnection.addIceCandidate(new RTCIceCandidate(cand));
+                } catch (_) {}
+              }
+            }
+          }
+        } catch (_) {}
+      }, 600);
+      this.signalingListeners.push(() => clearInterval(pollTimer));
+
+      // Dual listen for Offer in RTDB with silent error fallback
       const offerRef = ref(db, `signaling/${this.sessionId}/offer`);
       const offerListener = onValue(offerRef, async (snap) => {
         if (snap.exists() && this.peerConnection && !this.peerConnection.currentRemoteDescription) {
@@ -426,38 +554,48 @@ export class ReceiverPeer {
               new RTCSessionDescription({ type: offerData.type, sdp: offerData.sdp })
             );
 
-            // Create Answer
             const answer = await this.peerConnection.createAnswer();
             await this.peerConnection.setLocalDescription(answer);
 
-            // Write Answer to RTDB
-            await set(ref(db, `signaling/${this.sessionId}/answer`), {
+            const answerData = {
               type: answer.type,
               sdp: answer.sdp,
               createdAt: Date.now()
-            });
-          } catch (err) {
-            console.error('Error creating WebRTC answer:', err);
-          }
-        }
-      });
-      this.signalingListeners.push(() => off(offerRef, 'value', offerListener));
+            };
 
-      // Listen for Sender ICE candidates
+            fetch(`/api/signaling/${this.sessionId}/answer`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(answerData)
+            }).catch(() => {});
+
+            set(ref(db, `signaling/${this.sessionId}/answer`), answerData).catch(() => {});
+          } catch (_) {}
+        }
+      }, () => {});
+      this.signalingListeners.push(() => {
+        try { off(offerRef, 'value', offerListener); } catch (_) {}
+      });
+
+      // Dual listen for Sender ICE candidates in RTDB
       const senderCandRef = ref(db, `signaling/${this.sessionId}/senderCandidates`);
       const senderCandListener = onValue(senderCandRef, (snap) => {
         if (snap.exists() && this.peerConnection) {
           const candidates = snap.val();
           Object.values(candidates).forEach((cand: any) => {
-            try {
-              this.peerConnection?.addIceCandidate(new RTCIceCandidate(cand));
-            } catch (e) {
-              console.warn('ICE candidate addition notice:', e);
+            const key = JSON.stringify(cand);
+            if (!processedSenderCandidates.has(key)) {
+              processedSenderCandidates.add(key);
+              try {
+                this.peerConnection?.addIceCandidate(new RTCIceCandidate(cand));
+              } catch (_) {}
             }
           });
         }
+      }, () => {});
+      this.signalingListeners.push(() => {
+        try { off(senderCandRef, 'value', senderCandListener); } catch (_) {}
       });
-      this.signalingListeners.push(() => off(senderCandRef, 'value', senderCandListener));
 
     } catch (err) {
       this.updateState('failed', (err as Error).message);
